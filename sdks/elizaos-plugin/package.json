@@ -5,6 +5,15 @@
   "main": "dist/index.js",
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/nagysven/GateKeeper-Solana.git",
+    "directory": "sdks/elizaos-plugin"
+  },
   "scripts": {
     "build": "tsc",
     "test": "node --experimental-strip-types tests/test_action.ts"

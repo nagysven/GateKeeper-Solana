@@ -5,6 +5,15 @@
   "main": "dist/index.js",
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/nagysven/GateKeeper-Solana.git",
+    "directory": "sdks/typescript"
+  },
   "scripts": {
     "build": "tsc",
     "test": "echo \"TS test placeholder\""
