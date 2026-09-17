@@ -3,8 +3,8 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Python: 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://python.org)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-blue.svg)](https://www.typescriptlang.org/)
-[![Tests: 43/43](https://img.shields.io/badge/tests-43%20passed-brightgreen.svg)](tests/)
-[![Gateway: Live](https://img.shields.io/badge/Gateway-gk.ai--futures--bot.pro-green.svg)](https://gk.ai-futures-bot.pro/health)
+[![Tests: 47/47](https://img.shields.io/badge/tests-47%20passed-brightgreen.svg)](tests/)
+[![Gateway: Live](https://img.shields.io/badge/Gateway-gk.ai--futures--bot.pro-green.svg)](https://gk.ai-futures-bot.pro)
 
 > **Every autonomous AI agent signing raw Solana transactions burns 8–15% of its capital on slippage spikes, DEX reverts (`0x1771`), and account contention.**  
 > **Gatekeeper intercepts every intent before broadcast and guarantees ZERO gas burned on failed trades.**
