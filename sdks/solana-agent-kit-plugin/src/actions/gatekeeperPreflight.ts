@@ -23,6 +23,7 @@ export const GatekeeperPreflightInputSchema = z.object({
     .number()
     .nonnegative()
     .default(100000)
+    .optional()
     .describe("Maximum priority fee in Lamports the agent is willing to pay"),
   userWallet: z
     .string()
@@ -39,14 +40,15 @@ export function createGatekeeperPreflightAction(config?: GatekeeperConfig): Send
   );
 
   return {
-    name: "gatekeeper_preflight",
+    name: "gatekeeper_preflight_check",
     description:
-      "Simulates a proposed Solana swap off-chain via Gatekeeper to prevent burned gas on DEX reverts (0x1771), dynamically clamp compute units, and verify price impact before signing.",
+      "Deterministic Pre-Flight Transaction Security & Gas Firewall. Simulates a proposed Solana swap off-chain via Gatekeeper to prevent burned gas on DEX reverts (0x1771), dynamically clamps compute budget limits, and guarantees 0 gas burned on failed trades.",
     similes: [
       "verify_solana_swap",
       "check_swap_revert",
       "preflight_solana_trade",
-      "gatekeeper_check",
+      "gatekeeper_preflight",
+      "safe_swap_check",
     ],
     schema: GatekeeperPreflightInputSchema,
     examples: [
@@ -59,17 +61,30 @@ export function createGatekeeperPreflightAction(config?: GatekeeperConfig): Send
             maxSlippageBps: 50,
           },
           output: {
-            success: true,
+            status: "APPROVED",
             decision: "APPROVED",
             clampedComputeUnits: 49078,
-            message: "Trade intent approved: 150,922 compute units saved via dynamic clamping.",
+            clampedCuSaved: 150922,
+            feesSavedLamports: 0,
+            message: "Trade intent approved: 150,922 compute units saved via dynamic clamping. Safe to dispatch.",
           },
           explanation: "Pre-flight evaluation clears swap for on-chain dispatch with clamped compute budget.",
         },
       ],
     ],
     handler: async (_agent: any, input: Record<string, any>) => {
-      const parsed = GatekeeperPreflightInputSchema.parse(input);
+      // Normalize snake_case or camelCase
+      const normalizedInput = {
+        inputMint: input.inputMint || input.input_mint,
+        outputMint: input.outputMint || input.output_mint,
+        amount: input.amount,
+        maxSlippageBps: input.maxSlippageBps || input.max_slippage_bps || input.max_slippage || 50,
+        priorityFeeCapLamports:
+          input.priorityFeeCapLamports || input.priority_fee_cap_lamports || 100000,
+        userWallet: input.userWallet || input.user_wallet,
+      };
+
+      const parsed = GatekeeperPreflightInputSchema.parse(normalizedInput);
 
       const verdict = await client.evaluatePreflight({
         token_in: parsed.inputMint,
@@ -82,7 +97,7 @@ export function createGatekeeperPreflightAction(config?: GatekeeperConfig): Send
 
       if (verdict.decision === "APPROVED") {
         return {
-          success: true,
+          status: "APPROVED",
           decision: "APPROVED",
           action: "DISPATCH",
           executionTimeMs: verdict.execution_time_ms,
@@ -90,18 +105,23 @@ export function createGatekeeperPreflightAction(config?: GatekeeperConfig): Send
           clampedCuSaved: verdict.clamped_cu_saved,
           selectedRoute: verdict.selected_route,
           estimatedHops: verdict.estimated_hops,
-          message: `Gatekeeper Pre-Flight APPROVED in ${verdict.execution_time_ms}ms via ${verdict.selected_route || "DEX"}. Clamped CU Limit: ${verdict.clamped_compute_units} (Saved: ${verdict.clamped_cu_saved.toLocaleString()} CU). Safe to dispatch.`,
+          feesSavedLamports: 0,
+          feesSavedSol: "0.000000",
+          gasPaidOnChain: 0,
+          message: `Gatekeeper Pre-Flight APPROVED in ${verdict.execution_time_ms}ms via ${verdict.selected_route || "DEX"}. Clamped CU Limit: ${verdict.clamped_compute_units} (Saved: ${verdict.clamped_cu_saved.toLocaleString()} CU vs default). Safe to dispatch.`,
           verdict,
         };
       } else {
         const feesSol = (verdict.fees_saved_lamports / 1e9).toFixed(6);
         return {
-          success: false,
+          status: "HARD_ABORT",
           decision: "REJECTED",
           action: "HARD_ABORT",
           executionTimeMs: verdict.execution_time_ms,
           rejectionReason: verdict.rejection_reason || "REVERT_PREVENTED",
-          rejectionDetails: verdict.rejection_details || "Slippage or contention breach",
+          rejectionDetails: verdict.rejection_details || "Slippage or contention violation",
+          clampedComputeUnits: 0,
+          clampedCuSaved: 0,
           feesSavedLamports: verdict.fees_saved_lamports,
           feesSavedSol: feesSol,
           gasPaidOnChain: 0,

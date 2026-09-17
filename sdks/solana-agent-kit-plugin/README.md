@@ -46,57 +46,80 @@ Set the following variables in your `.env` or agent configuration:
 ## 🚀 Quickstart: Integrating into Solana Agent Kit
 
 ```typescript
+import { Keypair } from "@solana/web3.js";
 import { SolanaAgentKit, createSolanaTools } from "solana-agent-kit";
 import { createGatekeeperTools } from "@gatekeeper/solana-agent-kit";
+import bs58 from "bs58";
 
-// 1. Initialize the Solana Agent Kit
-const agent = new SolanaAgentKit(
-  process.env.SOLANA_PRIVATE_KEY!,
-  process.env.RPC_URL!,
-  process.env.OPENAI_API_KEY!
+// 1. Initialize SolanaAgentKit (via Keypair or Base58 Secret Key)
+const keypair = Keypair.fromSecretKey(bs58.decode(process.env.SOLANA_PRIVATE_KEY!));
+const agent = SolanaAgentKit.fromKeypair(
+  keypair,
+  process.env.RPC_URL || "https://api.mainnet-beta.solana.com",
+  { OPENAI_API_KEY: process.env.OPENAI_API_KEY }
 );
 
-// 2. Create Gatekeeper pre-flight tools
+// 2. Instantiate Gatekeeper pre-flight action
 const gatekeeperTools = createGatekeeperTools({
   apiKey: process.env.GATEKEEPER_API_KEY,
   baseUrl: process.env.GATEKEEPER_API_URL || "https://gk.ai-futures-bot.pro",
 });
 
-// 3. Combine with standard Solana tools for LangChain/Agent execution
+// 3. Combine with standard Solana tools for LangChain / LangGraph execution
 const allTools = [
   ...createSolanaTools(agent),
   ...gatekeeperTools,
 ];
 
-console.log("🛡️ Agent armed with Gatekeeper Pre-Flight Firewall!");
+console.log("🛡️ Agent armed with Gatekeeper Pre-Flight Firewall (gatekeeper_preflight_check)!");
 ```
 
 ---
 
-## 🔍 How It Works
+## 🔍 Tool: `gatekeeper_preflight_check`
 
-1. Prior to broadcasting a DEX swap, the agent calls the `gatekeeper_preflight` action:
-   ```json
-   {
-     "inputMint": "So11111111111111111111111111111111111111112",
-     "outputMint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
-     "amount": 100000000,
-     "maxSlippageBps": 50
-   }
-   ```
-2. If safe, Gatekeeper returns **`APPROVED`** with clamped compute units (`49,078 CU` vs standard `200,000 CU`).
-3. If unsafe (e.g. slippage exceed `0x1771`), Gatekeeper enforces **`HARD_ABORT`**:
-   ```json
-   {
-     "success": false,
-     "decision": "REJECTED",
-     "action": "HARD_ABORT",
-     "rejectionReason": "ERR_SLIPPAGE_EXCEEDED",
-     "gasPaidOnChain": 0,
-     "feesSavedLamports": 7556,
-     "message": "Gatekeeper HARD_ABORT triggered in 55ms! 0 gas burned on-chain. Preserved 0.007556 SOL in treasury."
-   }
-   ```
+Prior to broadcasting any DEX swap, the agent invokes `gatekeeper_preflight_check`:
+
+```json
+{
+  "inputMint": "So11111111111111111111111111111111111111112",
+  "outputMint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+  "amount": 100000000,
+  "maxSlippageBps": 50
+}
+```
+
+### Response Scenarios:
+
+#### 1. Scenario: Safe Execution (`APPROVED`)
+Gatekeeper optimizes execution parameters and clamps compute units dynamically:
+```json
+{
+  "status": "APPROVED",
+  "decision": "APPROVED",
+  "action": "DISPATCH",
+  "clampedComputeUnits": 49078,
+  "clampedCuSaved": 150922,
+  "selectedRoute": "RAYDIUM_CLMM",
+  "gasPaidOnChain": 0,
+  "message": "Gatekeeper Pre-Flight APPROVED in 68.4ms via RAYDIUM_CLMM. Clamped CU Limit: 49078 (Saved: 150,922 CU vs default). Safe to dispatch."
+}
+```
+
+#### 2. Scenario: Revert Prevented (`HARD_ABORT`)
+When slippage spike or liquidity crunch is detected off-chain (e.g. `0x1771`), Gatekeeper intercepts the trade:
+```json
+{
+  "status": "HARD_ABORT",
+  "decision": "REJECTED",
+  "action": "HARD_ABORT",
+  "rejectionReason": "ERR_SLIPPAGE_EXCEEDED",
+  "gasPaidOnChain": 0,
+  "feesSavedLamports": 7556,
+  "feesSavedSol": "0.000008",
+  "message": "Gatekeeper HARD_ABORT triggered in 48.9ms! Revert prevented: ERR_SLIPPAGE_EXCEEDED. 0 gas burned on-chain. Preserved 0.000008 SOL in treasury."
+}
+```
 
 ---
 

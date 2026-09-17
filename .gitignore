@@ -44,5 +44,5 @@ sdks/typescript/node_modules/
 sdks/typescript/dist/
 sdks/elizaos-plugin/node_modules/
 sdks/elizaos-plugin/dist/
-sdks/sendai-adapter/node_modules/
-sdks/sendai-adapter/dist/
+sdks/solana-agent-kit-plugin/node_modules/
+sdks/solana-agent-kit-plugin/dist/
