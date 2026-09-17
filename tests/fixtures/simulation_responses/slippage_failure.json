@@ -1,0 +1,52 @@
+{
+  "context": {
+    "apiVersion": "2.0.15",
+    "slot": 280000020
+  },
+  "value": {
+    "err": {
+      "InstructionError": [
+        2,
+        {
+          "Custom": 6001
+        }
+      ]
+    },
+    "unitsConsumed": 28310,
+    "logs": [
+      "Program ComputeBudget111111111111111111111111111111 invoke [1]",
+      "Program ComputeBudget111111111111111111111111111111 success",
+      "Program 675kPX9MHTjS2zt1qfr1NYHuzeLXfQM9H24wFSUt1Mp8 invoke [1]",
+      "Program log: Instruction: SwapBaseIn",
+      "Program log: AnchorError thrown in programs/amm/src/instructions/swap.rs:88. Error Code: SlippageExceeded (0x1771). Error Number: 6001. Error Message: Slippage tolerance exceeded.",
+      "Program 675kPX9MHTjS2zt1qfr1NYHuzeLXfQM9H24wFSUt1Mp8 consumed 28310 of 200000 compute units",
+      "Program 675kPX9MHTjS2zt1qfr1NYHuzeLXfQM9H24wFSUt1Mp8 failed: custom program error: 0x1771"
+    ],
+    "preTokenBalances": [
+      {
+        "accountIndex": 2,
+        "mint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+        "owner": "96gYZGLnJYVFmbjzopPSU6QiEV5fGqZNyN9nmNhvrZU5",
+        "uiTokenAmount": {
+          "amount": "10000000",
+          "decimals": 6,
+          "uiAmount": 10.0,
+          "uiAmountString": "10.0"
+        }
+      }
+    ],
+    "postTokenBalances": [
+      {
+        "accountIndex": 2,
+        "mint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+        "owner": "96gYZGLnJYVFmbjzopPSU6QiEV5fGqZNyN9nmNhvrZU5",
+        "uiTokenAmount": {
+          "amount": "10000000",
+          "decimals": 6,
+          "uiAmount": 10.0,
+          "uiAmountString": "10.0"
+        }
+      }
+    ]
+  }
+}

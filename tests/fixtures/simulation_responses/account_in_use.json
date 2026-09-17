@@ -1,0 +1,16 @@
+{
+  "context": {
+    "apiVersion": "2.0.15",
+    "slot": 280000020
+  },
+  "value": {
+    "err": "AccountInUse",
+    "unitsConsumed": 0,
+    "logs": [
+      "Transaction simulation failed: Account in use",
+      "Account CAMMCzo5YL8w4VFF8KVHrK22GGUsp5VTaW7grrKgrWqK is locked by another transaction"
+    ],
+    "preTokenBalances": [],
+    "postTokenBalances": []
+  }
+}

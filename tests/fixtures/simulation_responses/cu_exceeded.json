@@ -1,0 +1,20 @@
+{
+  "context": {
+    "apiVersion": "2.0.15",
+    "slot": 280000020
+  },
+  "value": {
+    "err": "ProgramFailedToComplete",
+    "unitsConsumed": 200000,
+    "logs": [
+      "Program ComputeBudget111111111111111111111111111111 invoke [1]",
+      "Program ComputeBudget111111111111111111111111111111 success",
+      "Program whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc invoke [1]",
+      "Program log: Instruction: TwoHopSwap",
+      "Program whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc consumed 200000 of 200000 compute units",
+      "Program failed to complete: consumed 200000 of 200000 compute units"
+    ],
+    "preTokenBalances": [],
+    "postTokenBalances": []
+  }
+}
