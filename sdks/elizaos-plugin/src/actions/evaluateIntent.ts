@@ -33,7 +33,10 @@ export const evaluateIntentAction: Action = {
     callback?: HandlerCallback
   ): Promise<boolean> => {
     const apiKey = runtime.getSetting("GATEKEEPER_API_KEY");
-    const baseUrl = runtime.getSetting("GATEKEEPER_BASE_URL") || "https://gk.ai-futures-bot.pro";
+    const baseUrl =
+      runtime.getSetting("GATEKEEPER_API_URL") ||
+      runtime.getSetting("GATEKEEPER_BASE_URL") ||
+      "https://gk.ai-futures-bot.pro";
 
     const client = new GatekeeperApiClient(apiKey, baseUrl);
 
