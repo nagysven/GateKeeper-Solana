@@ -41,6 +41,12 @@ class Settings(BaseSettings):
         description="Cluster commitment level used for simulations and checks.",
     )
 
+    # Jupiter DEX Aggregator API
+    JUPITER_API_URL: str = Field(
+        default="https://quote-api.jup.ag/v6",
+        description="Jupiter v6 API base URL for route synthesis and unsigned swaps.",
+    )
+
     # Dynamic Compute-Budget Clamping Buffers
     DIRECT_SWAP_CLAMPING_BUFFER: float = Field(
         default=1.12,

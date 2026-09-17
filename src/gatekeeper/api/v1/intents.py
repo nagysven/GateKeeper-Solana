@@ -1,15 +1,14 @@
-import uuid
 from typing import List, Optional, Union
 from fastapi import APIRouter, Depends, Request
 from pydantic import BaseModel, Field
 
 from gatekeeper.core.models import (
-    DexType,
     IntentRequest,
     RouteCandidate,
     ValidationResult,
 )
 from gatekeeper.engine.arbitrator import GatekeeperArbitrator
+from gatekeeper.engine.candidate_generator import RouteCandidateGenerator
 from gatekeeper.engine.simulator import PreFlightSimulator
 from gatekeeper.storage.repository import AuditLedgerRepository
 
@@ -22,7 +21,7 @@ class IntentEvaluationRequest(BaseModel):
     intent: IntentRequest
     candidates: Optional[List[RouteCandidate]] = Field(
         default=None,
-        description="Optional pre-generated candidates. If omitted, Gatekeeper synthesizes alternatives.",
+        description="Optional pre-generated candidates. If omitted, Gatekeeper synthesizes alternatives via Jupiter v6.",
     )
     current_cluster_slot: Optional[int] = Field(
         default=None,
@@ -54,12 +53,19 @@ def get_arbitrator(request: Request) -> GatekeeperArbitrator:
     return GatekeeperArbitrator()
 
 
+def get_candidate_generator(request: Request) -> RouteCandidateGenerator:
+    if hasattr(request.app.state, "candidate_generator"):
+        return request.app.state.candidate_generator
+    return RouteCandidateGenerator()
+
+
 @router.post("/evaluate", response_model=ValidationResult)
 async def evaluate_intent(
     payload: Union[IntentEvaluationRequest, IntentRequest],
     repo: AuditLedgerRepository = Depends(get_repository),
     simulator: PreFlightSimulator = Depends(get_simulator),
     arbitrator: GatekeeperArbitrator = Depends(get_arbitrator),
+    candidate_gen: RouteCandidateGenerator = Depends(get_candidate_generator),
 ) -> ValidationResult:
     """Pre-flight endpoint: Simulates routes concurrently, arbitrates DISPATCH vs HARD_ABORT, and audits fees."""
     # 1. Unpack request parameters
@@ -74,25 +80,11 @@ async def evaluate_intent(
         cluster_slot = intent.created_at_slot
         blockhash_slot = intent.created_at_slot
 
-    # 2. Synthesize candidates if none were supplied by the client
-    candidates = raw_candidates or [
-        RouteCandidate(
-            candidate_id=f"cand-raydium-{uuid.uuid4().hex[:8]}",
-            intent_id=intent.intent_id,
-            dex_type=DexType.RAYDIUM,
-            route_plan_json={"strategy": "direct-pool", "dex": "raydium"},
-            is_split=False,
-            estimated_hops=1,
-        ),
-        RouteCandidate(
-            candidate_id=f"cand-orca-{uuid.uuid4().hex[:8]}",
-            intent_id=intent.intent_id,
-            dex_type=DexType.ORCA,
-            route_plan_json={"strategy": "multi-hop", "dex": "orca-whirlpool"},
-            is_split=False,
-            estimated_hops=2,
-        ),
-    ]
+    # 2. Synthesize candidates via Jupiter DEX Aggregator if not provided
+    if raw_candidates:
+        candidates = raw_candidates
+    else:
+        candidates = await candidate_gen.generate_candidates(intent)
 
     # 3. Log intent & candidate routes atomically
     await repo.log_intent(intent=intent, status="SIMULATING")
