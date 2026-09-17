@@ -1,0 +1,32 @@
+{
+  "name": "@gatekeeper/solana-agent-kit",
+  "version": "0.1.0",
+  "description": "Solana Agent Kit (SendAI) Adapter for Project Gatekeeper - Deterministic Pre-Flight Firewall & CU Clamping",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "test": "node --experimental-strip-types tests/test_action.ts"
+  },
+  "keywords": [
+    "solana-agent-kit",
+    "sendai",
+    "ai-agents",
+    "solana",
+    "firewall",
+    "preflight",
+    "gatekeeper",
+    "mev-protection"
+  ],
+  "author": "Gatekeeper Contributors",
+  "license": "MIT",
+  "dependencies": {
+    "cross-fetch": "^4.0.0",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "typescript": "^5.4.0"
+  }
+}
