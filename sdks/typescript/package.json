@@ -1,0 +1,30 @@
+{
+  "name": "@gatekeeper/solana-sdk",
+  "version": "0.1.0",
+  "description": "Deterministic Pre-Flight Transaction Security & Firewall SDK for Solana AI Agents",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "test": "echo \"TS test placeholder\""
+  },
+  "keywords": [
+    "solana",
+    "ai-agents",
+    "preflight",
+    "firewall",
+    "elizaos",
+    "sendai",
+    "jupiter",
+    "mev"
+  ],
+  "author": "Gatekeeper Contributors",
+  "license": "MIT",
+  "dependencies": {
+    "cross-fetch": "^4.0.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.0"
+  }
+}

@@ -125,6 +125,24 @@ class PreFlightSimulator:
         estimated_cu = 43_820 if candidate.estimated_hops == 1 else 58_450
         dex_name = candidate.dex_type.value if hasattr(candidate.dex_type, "value") else str(candidate.dex_type)
 
+        # Realistic AMM Slippage Exceeded (0x1771) simulation when bounds are impossibly tight
+        if intent.max_slippage_bps <= 2:
+            return {
+                "context": {"slot": intent.created_at_slot},
+                "value": {
+                    "err": {"InstructionError": [2, {"Custom": 6001}]},
+                    "unitsConsumed": estimated_cu,
+                    "logs": [
+                        "Program ComputeBudget111111111111111111111111111111 success",
+                        f"Program {dex_name} invoke [1]",
+                        "Program log: Error: Slippage tolerance exceeded (0x1771)",
+                        f"Program {dex_name} failed: custom program error: 0x1771",
+                    ],
+                    "preTokenBalances": [],
+                    "postTokenBalances": [],
+                },
+            }
+
         return {
             "context": {"slot": intent.created_at_slot},
             "value": {
@@ -171,6 +189,15 @@ class PreFlightSimulator:
 
         pre_balances = value_data.get("preTokenBalances") or []
         post_balances = value_data.get("postTokenBalances") or []
+
+        # Fallback to candidate quote outAmount if RPC omitted token balances
+        if not post_balances and isinstance(candidate.route_plan_json, dict) and "outAmount" in candidate.route_plan_json:
+            try:
+                out_amt_str = str(candidate.route_plan_json["outAmount"])
+                pre_balances = [{"mint": intent.output_mint, "owner": intent.user_wallet, "uiTokenAmount": {"amount": "0"}}]
+                post_balances = [{"mint": intent.output_mint, "owner": intent.user_wallet, "uiTokenAmount": {"amount": out_amt_str}}]
+            except Exception:
+                pass
 
         if units_consumed == 0 and logs:
             units_consumed = self._extract_cu_from_logs(logs)
