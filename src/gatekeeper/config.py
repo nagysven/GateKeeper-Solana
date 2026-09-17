@@ -11,6 +11,12 @@ class Settings(BaseSettings):
         extra="ignore",
     )
 
+    # Security & Authentication
+    API_KEY: str = Field(
+        default="gk-sec-master-key-change-in-prod",
+        description="Master API key required for X-Gatekeeper-Key header authentication.",
+    )
+
     # Solana Network & RPC Configuration
     RPC_URL: str = Field(
         default="https://api.mainnet-beta.solana.com",

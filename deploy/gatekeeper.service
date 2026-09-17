@@ -1,0 +1,29 @@
+[Unit]
+Description=Project Gatekeeper - Deterministic Solana Middleware
+After=network.target network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=gatekeeper
+Group=gatekeeper
+WorkingDirectory=/opt/gatekeeper
+EnvironmentFile=/opt/gatekeeper/.env
+ExecStart=/opt/gatekeeper/.venv/bin/uvicorn gatekeeper.main:app --host 127.0.0.1 --port 8000 --workers 4 --loop uvloop --http httptools --proxy-headers
+Restart=always
+RestartSec=3
+KillSignal=SIGTERM
+TimeoutStopSec=15
+LimitNOFILE=65535
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=gatekeeper
+
+# Security sandboxing
+ProtectSystem=full
+ProtectHome=true
+NoNewPrivileges=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

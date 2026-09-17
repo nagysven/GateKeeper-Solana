@@ -10,6 +10,8 @@ from gatekeeper.main import app
 from gatekeeper.storage.database import DatabaseManager
 from gatekeeper.storage.repository import AuditLedgerRepository
 
+TEST_API_KEY = "gk-test-secret-key-12345"
+
 
 @pytest.fixture
 def fixtures_dir() -> Path:
@@ -28,12 +30,13 @@ def slippage_failure_payload(fixtures_dir: Path):
 
 @pytest.fixture
 async def test_client(tmp_path: Path):
-    """Sets up FastAPI app with an isolated test SQLite database using tmp_path."""
+    """Sets up FastAPI app with an isolated test SQLite database and configured API Key."""
     db_path = str(tmp_path / "test_api.db")
-    cfg = Settings(DATABASE_PATH=db_path, ENABLE_WAL_MODE=True)
+    cfg = Settings(DATABASE_PATH=db_path, ENABLE_WAL_MODE=True, API_KEY=TEST_API_KEY)
     db_mgr = DatabaseManager(db_path=db_path, config=cfg)
     await db_mgr.init_db()
 
+    app.state.api_key = TEST_API_KEY
     app.state.db_manager = db_mgr
     app.state.repository = AuditLedgerRepository(db_mgr)
     app.state.simulator = PreFlightSimulator(config=cfg)
@@ -46,12 +49,30 @@ async def test_client(tmp_path: Path):
 
 
 class TestApiEndpoints:
-    async def test_health_check(self, test_client: httpx.AsyncClient):
+    async def test_health_check_open_without_auth(self, test_client: httpx.AsyncClient):
+        """Verify /health is publicly accessible without API-Key header."""
         response = await test_client.get("/health")
         assert response.status_code == 200
         data = response.json()
         assert data["status"] == "healthy"
         assert data["service"] == "gatekeeper"
+
+    async def test_auth_missing_header_rejected_with_401(
+        self, test_client: httpx.AsyncClient
+    ):
+        """Requests without X-Gatekeeper-Key to protected /api/v1 routes return 401."""
+        response = await test_client.get("/api/v1/metrics/savings")
+        assert response.status_code == 401
+        assert "Missing required authentication header" in response.json()["detail"]
+
+    async def test_auth_invalid_header_rejected_with_401(
+        self, test_client: httpx.AsyncClient
+    ):
+        """Requests with invalid X-Gatekeeper-Key return 401."""
+        headers = {"X-Gatekeeper-Key": "wrong-key-value"}
+        response = await test_client.get("/api/v1/metrics/savings", headers=headers)
+        assert response.status_code == 401
+        assert "Invalid X-Gatekeeper-Key" in response.json()["detail"]
 
     async def test_evaluate_intent_successful_dispatch_flow(
         self,
@@ -66,6 +87,7 @@ class TestApiEndpoints:
             rpc_dispatcher=lambda _c, _i: raydium_success_payload
         )
 
+        headers = {"X-Gatekeeper-Key": TEST_API_KEY}
         payload = {
             "intent": {
                 "agent_id": "fastapi-agent-1",
@@ -81,7 +103,9 @@ class TestApiEndpoints:
             }
         }
 
-        response = await test_client.post("/api/v1/intent/evaluate", json=payload)
+        response = await test_client.post(
+            "/api/v1/intent/evaluate", json=payload, headers=headers
+        )
         assert response.status_code == 200
         data = response.json()
 
@@ -99,11 +123,11 @@ class TestApiEndpoints:
         valid_wallet_pubkey: str,
         slippage_failure_payload: dict,
     ):
-        # Configure simulator to return slippage failure
         app.state.simulator = PreFlightSimulator(
             rpc_dispatcher=lambda _c, _i: slippage_failure_payload
         )
 
+        headers = {"X-Gatekeeper-Key": TEST_API_KEY}
         payload = {
             "intent": {
                 "agent_id": "fastapi-agent-2",
@@ -119,7 +143,9 @@ class TestApiEndpoints:
             }
         }
 
-        response = await test_client.post("/api/v1/intent/evaluate", json=payload)
+        response = await test_client.post(
+            "/api/v1/intent/evaluate", json=payload, headers=headers
+        )
         assert response.status_code == 200
         data = response.json()
 
@@ -138,7 +164,7 @@ class TestApiEndpoints:
         valid_wallet_pubkey: str,
         slippage_failure_payload: dict,
     ):
-        # Execute an abort flow first to generate metrics
+        headers = {"X-Gatekeeper-Key": TEST_API_KEY}
         app.state.simulator = PreFlightSimulator(
             rpc_dispatcher=lambda _c, _i: slippage_failure_payload
         )
@@ -156,10 +182,11 @@ class TestApiEndpoints:
                 "valid_until_slot": 280_000_050,
             }
         }
-        await test_client.post("/api/v1/intent/evaluate", json=payload)
+        await test_client.post(
+            "/api/v1/intent/evaluate", json=payload, headers=headers
+        )
 
-        # Query metrics endpoint
-        response = await test_client.get("/api/v1/metrics/savings")
+        response = await test_client.get("/api/v1/metrics/savings", headers=headers)
         assert response.status_code == 200
         metrics = response.json()
 
@@ -170,6 +197,7 @@ class TestApiEndpoints:
         assert "ERR_SLIPPAGE_EXCEEDED" in metrics["aborts_by_reason"]
 
     async def test_invalid_pubkey_returns_422(self, test_client: httpx.AsyncClient):
+        headers = {"X-Gatekeeper-Key": TEST_API_KEY}
         invalid_payload = {
             "intent": {
                 "agent_id": "malformed-agent",
@@ -183,5 +211,7 @@ class TestApiEndpoints:
                 "valid_until_slot": 20,
             }
         }
-        response = await test_client.post("/api/v1/intent/evaluate", json=invalid_payload)
+        response = await test_client.post(
+            "/api/v1/intent/evaluate", json=invalid_payload, headers=headers
+        )
         assert response.status_code == 422
