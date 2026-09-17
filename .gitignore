@@ -38,3 +38,7 @@ htmlcov/
 *.db-shm
 *.log
 .env
+
+sdks/typescript/node_modules/
+sdks/typescript/dist/
+
