@@ -11,6 +11,16 @@ class Settings(BaseSettings):
         extra="ignore",
     )
 
+    # Server Binding (8001 to coexist with existing bots on 8000)
+    HOST: str = Field(
+        default="127.0.0.1",
+        description="Internal loopback IP address for Gatekeeper service binding.",
+    )
+    PORT: int = Field(
+        default=8001,
+        description="Internal port for Gatekeeper service (8001 avoids collisions with existing services).",
+    )
+
     # Security & Authentication
     API_KEY: str = Field(
         default="gk-sec-master-key-change-in-prod",

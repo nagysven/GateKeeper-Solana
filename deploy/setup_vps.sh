@@ -1,13 +1,15 @@
 #!/usr/bin/env bash
 # ==============================================================================
-# Project Gatekeeper - Automated VPS Provisioning & Hardening Script
+# Project Gatekeeper - Additive Non-Destructive VPS Provisioning Script
 # Target OS: Ubuntu 22.04 / 24.04 LTS, Debian 12
+# Safe for co-existence alongside existing production services (e.g. ai-futures-bot.pro)
 # ==============================================================================
 
 set -euo pipefail
 
 echo "========================================================="
-echo "   Starting Project Gatekeeper Production VPS Setup      "
+echo "   Starting Project Gatekeeper Production Setup (Safe)   "
+echo "   Coexistence Mode: Dedicated Port 8001 & Subdomain     "
 echo "========================================================="
 
 # 1. Root privilege verification
@@ -16,30 +18,28 @@ if [[ $EUID -ne 0 ]]; then
    exit 1
 fi
 
-# 2. System updates & package installation
-echo "[1/6] Updating system packages & installing dependencies..."
+# 2. System updates & additive package installation
+echo "[1/6] Installing necessary system packages..."
 export DEBIAN_FRONTEND=noninteractive
 apt-get update -y
 apt-get install -y --no-install-recommends \
     python3-venv \
     python3-pip \
     nginx \
-    ufw \
     sqlite3 \
     curl \
     git
 
-# 3. UFW Firewall Hardening
-echo "[2/6] Configuring UFW Firewall..."
-ufw default deny incoming
-ufw default allow outgoing
-ufw allow 22/tcp comment 'SSH'
-ufw allow 80/tcp comment 'HTTP'
-ufw allow 443/tcp comment 'HTTPS'
-# Explicitly ensure backend port 8000 is blocked from external interfaces
-ufw deny 8000/tcp comment 'Block Direct Middleware Port'
-ufw --force enable
-echo "Firewall active: SSH(22), HTTP(80), HTTPS(443) enabled."
+# 3. Additive Firewall configuration (Never resets or flushes existing rules)
+if command -v ufw >/dev/null 2>&1; then
+    echo "[2/6] Additively verifying UFW Firewall rules..."
+    ufw allow 22/tcp comment 'SSH' || true
+    ufw allow 80/tcp comment 'HTTP' || true
+    ufw allow 443/tcp comment 'HTTPS' || true
+    echo "Firewall rules confirmed for 22, 80, 443. Existing rules remain untouched."
+else
+    echo "[2/6] UFW not detected, skipping firewall modification."
+fi
 
 # 4. Service user & directory creation
 echo "[3/6] Setting up service user and application directories..."
@@ -61,12 +61,19 @@ if [[ -f "$APP_DIR/pyproject.toml" ]]; then
     sudo -u gatekeeper "$APP_DIR/.venv/bin/pip" install -e "$APP_DIR"
 fi
 
-# Generate random secure master API key if .env does not exist
+# Create non-colliding .env with port 8001 if not already present
 if [[ ! -f "$APP_DIR/.env" ]]; then
     GENERATED_KEY=$(head -c 32 /dev/urandom | base64 | tr -dc 'a-zA-Z0-9' | head -c 32)
     cat <<EOF > "$APP_DIR/.env"
+# Gatekeeper Server Binding
+GATEKEEPER_HOST=127.0.0.1
+GATEKEEPER_PORT=8001
+
+# Authentication
 GATEKEEPER_API_KEY=gk_${GENERATED_KEY}
 GATEKEEPER_LOG_LEVEL=INFO
+
+# Storage & Cluster
 GATEKEEPER_DATABASE_PATH=/opt/gatekeeper/gatekeeper_audit.db
 GATEKEEPER_ENABLE_WAL_MODE=True
 GATEKEEPER_RPC_URL=https://api.mainnet-beta.solana.com
@@ -74,11 +81,13 @@ GATEKEEPER_WSS_URL=wss://api.mainnet-beta.solana.com
 EOF
     chown gatekeeper:gatekeeper "$APP_DIR/.env"
     chmod 600 "$APP_DIR/.env"
-    echo "Created /opt/gatekeeper/.env with generated master API key."
+    echo "Created /opt/gatekeeper/.env on port 8001 with generated master API key."
+else
+    echo "Existing .env found. Keeping current configuration."
 fi
 
-# 6. Systemd & Nginx configuration
-echo "[5/6] Deploying Systemd Service & Nginx Reverse Proxy..."
+# 6. Additive Systemd & Nginx configuration (No existing sites touched)
+echo "[5/6] Deploying Systemd Service & Subdomain Nginx Site..."
 if [[ -f "$APP_DIR/deploy/gatekeeper.service" ]]; then
     cp "$APP_DIR/deploy/gatekeeper.service" /etc/systemd/system/gatekeeper.service
     systemctl daemon-reload
@@ -87,16 +96,24 @@ fi
 
 if [[ -f "$APP_DIR/deploy/nginx_gatekeeper.conf" ]]; then
     cp "$APP_DIR/deploy/nginx_gatekeeper.conf" /etc/nginx/sites-available/gatekeeper.conf
-    ln -sf /etc/nginx/sites-available/gatekeeper.conf /etc/nginx/sites-enabled/
-    rm -f /etc/nginx/sites-enabled/default
-    nginx -t && systemctl restart nginx
+    # Additive symlink: does NOT delete or overwrite existing enabled sites
+    ln -sf /etc/nginx/sites-available/gatekeeper.conf /etc/nginx/sites-enabled/gatekeeper.conf
+    
+    # Test Nginx syntax safely before reloading
+    if nginx -t; then
+        systemctl reload nginx
+        echo "Nginx successfully reloaded with dedicated Gatekeeper subdomain site."
+    else
+        echo "[WARNING] Nginx syntax test failed. Please inspect /etc/nginx/sites-available/gatekeeper.conf."
+    fi
 fi
 
-echo "[6/6] Starting Gatekeeper service..."
+echo "[6/6] Starting Gatekeeper service on port 8001..."
 systemctl restart gatekeeper
 
 echo "========================================================="
-echo "   Gatekeeper Middleware successfully provisioned!       "
-echo "   Service status: $(systemctl is-active gatekeeper)    "
-echo "   Nginx status:   $(systemctl is-active nginx)         "
+echo "   Gatekeeper successfully provisioned in coexistence!   "
+echo "   Internal Address: 127.0.0.1:8001                      "
+echo "   Subdomain:        gk.ai-futures-bot.pro               "
+echo "   Gatekeeper Unit:  $(systemctl is-active gatekeeper)   "
 echo "========================================================="
