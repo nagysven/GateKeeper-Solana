@@ -5,11 +5,11 @@ Wants=network-online.target
 
 [Service]
 Type=simple
-User=gatekeeper
-Group=gatekeeper
+User=www-data
+Group=www-data
 WorkingDirectory=/opt/gatekeeper
 EnvironmentFile=/opt/gatekeeper/.env
-ExecStart=/opt/gatekeeper/.venv/bin/uvicorn gatekeeper.main:app --host 127.0.0.1 --port 8001 --workers 4 --loop uvloop --http httptools --proxy-headers
+ExecStart=/opt/gatekeeper/.venv/bin/uvicorn gatekeeper.main:app --host 127.0.0.1 --port 8001 --workers 4 --proxy-headers
 Restart=always
 RestartSec=3
 KillSignal=SIGTERM
@@ -19,7 +19,7 @@ StandardOutput=journal
 StandardError=journal
 SyslogIdentifier=gatekeeper
 
-# Security sandboxing
+# Security Sandboxing
 ProtectSystem=full
 ProtectHome=true
 NoNewPrivileges=true

@@ -1,126 +1,170 @@
-# Project Gatekeeper – VPS Production Deployment Guide
+# Project Gatekeeper – Schluesselfertiges VPS Rollout-Paket
 
-Dieser Leitfaden beschreibt die schlüsselfertige Inbetriebnahme von **Project Gatekeeper** auf einem Produktions-VPS, auf dem bereits bestehende Dienste laufen (z. B. `https://ai-futures-bot.pro/`).
-
----
-
-## 1. Koexistenz mit bestehenden Diensten auf dem VPS (ai-futures-bot.pro)
-
-Gatekeeper ist so konzipiert, dass es **vollkommen isoliert und kollisionsfrei** neben existierenden Trading-Bots und Webdiensten arbeitet:
-
-1. **Eigener interner Port (127.0.0.1:8001)**:
-   - Während Standard-Bots meist auf Port 8000 laufen, bindet Gatekeeper fest an Port `8001`.
-   - Der bestehende Dienst auf Port 8000 oder anderen Ports wird nicht berührt.
-2. **Eigenständiger Nginx Server-Block (`gk.ai-futures-bot.pro`)**:
-   - Gatekeeper erhält eine eigene Konfigurationsdatei `/etc/nginx/sites-available/gatekeeper.conf`.
-   - Die bestehende Konfiguration für `ai-futures-bot.pro` bleibt zu 100 % unberührt.
-3. **Rein additiver Setup-Prozess**:
-   - `deploy/setup_vps.sh` löscht **keine** existierenden Nginx-Sites und setzt keine UFW-Firewall-Regeln blind zurück.
-4. **Lokale Hochgeschwindigkeits-Anbindung für den Bot**:
-   - Der auf demselben Server laufende Trading-Bot kann Gatekeeper extrem schnell über den lokalen Loopback ansprechen:
-     $$\text{Endpoint}: \texttt{http://127.0.0.1:8001/api/v1/intent/evaluate}$$
-     *(Latenz: < 0.2 Millisekunden, kein SSL-Overhead auf dem internen Loopback!)*
+**Ziel-Server**: `85.215.195.247`  
+**Subdomain**: `gk.ai-futures-bot.pro`  
+**Bestehender Dienst**: `https://ai-futures-bot.pro/` (bleibt zu 100 % unberuehrt)  
+**Interner Port**: `127.0.0.1:8001`  
+**Service-User**: `www-data`  
 
 ---
 
-## 2. DNS-Vorbereitung für die Subdomain
+## 1. DNS-Voraussetzung pruefen
 
-Erstelle bei deinem Domain-Provider für `ai-futures-bot.pro` einen DNS A-Record:
-
-| Typ | Host / Name | Wert / Ziel | TTL |
-|---|---|---|---|
-| **A** | `gk` | `<VPS-IP-Adresse>` | 300 (oder Auto) |
-
-Damit löst `gk.ai-futures-bot.pro` auf deinen VPS auf.
-
----
-
-## 3. Installation auf dem VPS
-
-Führe als `root` (oder via `sudo`) auf dem Server folgende Schritte aus:
-
+Stelle sicher, dass der DNS A-Record fuer die Subdomain gesetzt ist:
 ```bash
-# 1. Repository nach /opt/gatekeeper klonen
-sudo git clone https://github.com/your-org/gatekeeper.git /opt/gatekeeper
-cd /opt/gatekeeper
-
-# 2. Ausführungsrechte für das additive Setup-Script setzen
-chmod +x deploy/setup_vps.sh
-
-# 3. Additive Ersteinrichtung starten
-sudo ./deploy/setup_vps.sh
+# Von lokalem Rechner aus testen:
+dig +short gk.ai-futures-bot.pro
+# Muss 85.215.195.247 zurueckgeben
 ```
 
-Das Skript:
-- Installiert fehlende Systempakete additiv.
-- Richtet einen isolierten Service-User `gatekeeper` und Python `.venv` ein.
-- Erzeugt eine geschützte `.env`-Datei auf Port `8001` mit einem generierten 32-Byte API-Key.
-- Aktiviert den Systemd-Dienst `gatekeeper.service` und verlinkt `gatekeeper.conf` in Nginx.
+---
+
+## 2. Nummerierte Rollout-Befehlsliste (Direkt auf dem VPS als root ausfuehren)
+
+### Schritt 1: Projektverzeichnis anlegen und Code bereitstellen
+
+```bash
+# Verzeichnis anlegen
+mkdir -p /opt/gatekeeper
+
+# Option A: Falls Git-Repo verfuegbar
+# git clone <REPO_URL> /opt/gatekeeper
+
+# Option B: Per Rsync von lokalem Entwicklungsrechner uebertragen (vom lokalen PC ausfuehren):
+# rsync -avz --exclude '.git' --exclude '.pytest_cache' --exclude '__pycache__' F:/GateKeeper/ root@85.215.195.247:/opt/gatekeeper/
+```
 
 ---
 
-## 4. Konfiguration anpassen (`/opt/gatekeeper/.env`)
+### Schritt 2: Berechtigungen & Python Virtualenv einrichten
 
 ```bash
-sudo nano /opt/gatekeeper/.env
+# Eigentuemer auf www-data setzen
+chown -R www-data:www-data /opt/gatekeeper
+
+# Python 3 venv als www-data anlegen
+sudo -u www-data python3 -m venv /opt/gatekeeper/.venv
+
+# Pip aktualisieren und Gatekeeper-Paket installieren
+sudo -u www-data /opt/gatekeeper/.venv/bin/pip install --upgrade pip setuptools wheel
+sudo -u www-data /opt/gatekeeper/.venv/bin/pip install -e /opt/gatekeeper
 ```
 
-Beispielkonfiguration:
-```ini
-# Server-Binding
+---
+
+### Schritt 3: Produktions-Umgebungsvariablen konfigurieren (`.env`)
+
+Erzeuge die Konfigurationsdatei `/opt/gatekeeper/.env` mit einem sicheren Master-API-Key:
+
+```bash
+# Zufalls-API-Key erzeugen und .env schreiben
+API_SECRET=$(openssl rand -hex 24)
+
+cat <<EOF > /opt/gatekeeper/.env
 GATEKEEPER_HOST=127.0.0.1
 GATEKEEPER_PORT=8001
-
-# Authentifizierung
-GATEKEEPER_API_KEY=gk_dein_geheimer_schluessel_hier
-
-# Solana RPC & Cluster
-GATEKEEPER_RPC_URL=https://mainnet.helius-rpc.com/?api-key=DEIN_RPC_KEY
-GATEKEEPER_WSS_URL=wss://mainnet.helius-rpc.com/?api-key=DEIN_RPC_KEY
-GATEKEEPER_COMMITMENT=confirmed
-
-# Clamping-Puffer
+GATEKEEPER_API_KEY=gk_${API_SECRET}
+GATEKEEPER_LOG_LEVEL=INFO
+GATEKEEPER_DATABASE_PATH=/opt/gatekeeper/gatekeeper_audit.db
+GATEKEEPER_ENABLE_WAL_MODE=True
+GATEKEEPER_RPC_URL=https://api.mainnet-beta.solana.com
+GATEKEEPER_WSS_URL=wss://api.mainnet-beta.solana.com
+GATEKEEPER_JUPITER_API_URL=https://quote-api.jup.ag/v6
 GATEKEEPER_DIRECT_SWAP_CLAMPING_BUFFER=1.12
 GATEKEEPER_MULTI_HOP_CLAMPING_BUFFER=1.20
 GATEKEEPER_DEFAULT_PRIORITY_FEE_MICRO_LAMPORTS=50000
 GATEKEEPER_DEFAULT_JITO_TIP_LAMPORTS=10000
+EOF
 
-# VPS SQLite Ledger
-GATEKEEPER_DATABASE_PATH=/opt/gatekeeper/gatekeeper_audit.db
-GATEKEEPER_ENABLE_WAL_MODE=True
-GATEKEEPER_LOG_LEVEL=INFO
-```
+# Rechte strikt auf www-data beschraenken
+chown www-data:www-data /opt/gatekeeper/.env
+chmod 600 /opt/gatekeeper/.env
 
-Dienst neu starten:
-```bash
-sudo systemctl restart gatekeeper
+echo "Gatekeeper API-Key erstellt: gk_${API_SECRET}"
 ```
 
 ---
 
-## 5. Kostenloses SSL-Zertifikat für die Subdomain einrichten
-
-Certbot holt ein separates Zertifikat ausschließlich für die neue Subdomain, ohne das bestehende Zertifikat von `ai-futures-bot.pro` zu überschreiben:
+### Schritt 4: Systemd-Dienst registrieren und starten
 
 ```bash
-sudo certbot --nginx -d gk.ai-futures-bot.pro
+# Service-Unit kopieren
+cp /opt/gatekeeper/deploy/gatekeeper.service /etc/systemd/system/gatekeeper.service
+
+# Daemon neu laden und Dienst aktivieren
+systemctl daemon-reload
+systemctl enable gatekeeper
+systemctl restart gatekeeper
+
+# Status pruefen
+systemctl status gatekeeper --no-pager
 ```
 
 ---
 
-## 6. Überprüfung & Funktionsprüfung
+### Schritt 5: Internen Healthcheck auf Port 8001 testen
 
 ```bash
-# 1. Systemd Status & Live-Logs prüfen
-sudo systemctl status gatekeeper
-sudo journalctl -u gatekeeper -f
-
-# 2. Lokalen Health-Check auf Port 8001 testen
+# Direkte Pruefung auf dem internen Loopback
 curl -i http://127.0.0.1:8001/health
+```
+**Erwartete Ausgabe**: `HTTP/1.1 200 OK` mit `{"status":"healthy","service":"gatekeeper","version":"0.1.0"}`.
 
-# 3. Externen Zugriff über die Subdomain prüfen
+---
+
+### Schritt 6: Nginx-Subdomain isoliert anbinden (Rein Additiv!)
+
+```bash
+# 1. Konfiguration fuer gk.ai-futures-bot.pro in sites-available kopieren
+cp /opt/gatekeeper/deploy/gk.ai-futures-bot.pro /etc/nginx/sites-available/gk.ai-futures-bot.pro
+
+# 2. Additive Verlinkung in sites-enabled (beruehrt keine bestehenden Sites!)
+ln -sf /etc/nginx/sites-available/gk.ai-futures-bot.pro /etc/nginx/sites-enabled/gk.ai-futures-bot.pro
+
+# 3. ZWINGENDE SYNTAX-PRUEFUNG vor jedem Reload!
+nginx -t
+```
+> [!IMPORTANT]
+> Führe den nächsten Befehl nur aus, wenn `nginx -t` mit `syntax is ok` und `test is successful` antwortet!
+
+```bash
+# 4. Nginx sicher remappen ohne Ausfallzeit bestehender Verbindungen
+systemctl reload nginx
+```
+
+---
+
+### Schritt 7: SSL-Zertifikat mit Certbot rein für die Subdomain abrufen
+
+```bash
+# Certbot ausschließlich fuer die Subdomain ausfuehren
+certbot --nginx -d gk.ai-futures-bot.pro --redirect
+```
+
+---
+
+### Schritt 8: End-to-End Verifikation & Smoke-Tests
+
+Führe abschließend diese 3 Prüfbefehle aus:
+
+```bash
+# 1. Oeffentlicher HTTPS-Healthcheck (ohne Authentifizierung)
 curl -i https://gk.ai-futures-bot.pro/health
 
-# 4. Geschützten Endpunkt mit API-Key testen
-curl -i -H "X-Gatekeeper-Key: <DEIN_API_KEY>" https://gk.ai-futures-bot.pro/api/v1/metrics/savings
+# 2. Sicherheitspruefung: Geschuetzter Endpunkt ohne API-Key (Muss 401 Unauthorized liefern)
+curl -i https://gk.ai-futures-bot.pro/api/v1/metrics/savings
+
+# 3. Authentifizierte Metriken-Abfrage mit Header
+API_KEY=$(grep GATEKEEPER_API_KEY /opt/gatekeeper/.env | cut -d '=' -f2)
+curl -i -H "X-Gatekeeper-Key: $API_KEY" https://gk.ai-futures-bot.pro/api/v1/metrics/savings
 ```
+
+---
+
+## 3. Direkte Anbindung des bestehenden Trading-Bots (`ai-futures-bot.pro`)
+
+Der bereits auf demselben VPS laufende Bot kann Gatekeeper **lokal über Loopback** ohne Latenz oder SSL-Overhead ansprechen:
+
+- **Lokale URL**: `http://127.0.0.1:8001/api/v1/intent/evaluate`
+- **Header**: `X-Gatekeeper-Key: <DEIN_API_KEY>`
+- **Netzwerk-Latenz**: $<0.15$ ms
