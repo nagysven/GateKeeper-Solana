@@ -1,0 +1,31 @@
+{
+  "name": "@gatekeeper/elizaos-plugin",
+  "version": "0.1.0",
+  "description": "ElizaOS Plugin for Project Gatekeeper - Deterministic Pre-Flight Firewall & Gas Protection on Solana",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "test": "echo \"Plugin test suite placeholder\""
+  },
+  "keywords": [
+    "elizaos",
+    "elizaos-plugin",
+    "ai-agents",
+    "solana",
+    "firewall",
+    "preflight",
+    "gatekeeper",
+    "mev-protection"
+  ],
+  "author": "Gatekeeper Contributors",
+  "license": "MIT",
+  "dependencies": {
+    "cross-fetch": "^4.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "typescript": "^5.4.0"
+  }
+}

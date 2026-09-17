@@ -39,6 +39,8 @@ htmlcov/
 *.log
 .env
 
+# SDK node_modules and builds
 sdks/typescript/node_modules/
 sdks/typescript/dist/
-
+sdks/elizaos-plugin/node_modules/
+sdks/elizaos-plugin/dist/
