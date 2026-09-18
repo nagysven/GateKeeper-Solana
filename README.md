@@ -134,18 +134,18 @@ if __name__ == "__main__":
 
 ---
 
-## 🌐 Quickstart: TypeScript SDK (`@gatekeeper/solana-sdk`)
+## 🌐 Quickstart: TypeScript SDK (`gatekeeper-solana-sdk`)
 
 ### 1. Installation
 
 ```bash
-npm install @gatekeeper/solana-sdk
+npm install gatekeeper-solana-sdk
 ```
 
 ### 2. Node.js / ElizaOS Integration
 
 ```typescript
-import { GatekeeperClient } from "@gatekeeper/solana-sdk";
+import { GatekeeperClient } from "gatekeeper-solana-sdk";
 
 const gk = new GatekeeperClient({
   apiKey: process.env.GATEKEEPER_API_KEY!,

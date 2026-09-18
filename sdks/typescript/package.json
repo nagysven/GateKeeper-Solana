@@ -1,5 +1,5 @@
 {
-  "name": "@gatekeeper/solana-sdk",
+  "name": "gatekeeper-solana-sdk",
   "version": "0.1.0",
   "description": "Deterministic Pre-Flight Transaction Security & Firewall SDK for Solana AI Agents",
   "main": "dist/index.js",

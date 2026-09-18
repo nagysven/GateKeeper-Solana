@@ -1,11 +1,12 @@
-# @gatekeeper/solana-sdk
+# gatekeeper-solana-sdk
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-blue.svg)](https://www.typescriptlang.org/)
+[![npm](https://img.shields.io/npm/v/gatekeeper-solana-sdk.svg)](https://www.npmjs.com/package/gatekeeper-solana-sdk)
 
-**The Deterministic Firewall for Autonomous Solana AI Agents.**
+**The Deterministic Pre-Flight Security & Firewall SDK for Autonomous Solana AI Agents.**
 
-`@gatekeeper/solana-sdk` provides native TypeScript client support for AI trading agents, ElizaOS plugins, and autonomous bots to intercept swap intents, simulate execution off-chain against live RPC state, and prevent failed transactions from burning gas on Solana.
+`gatekeeper-solana-sdk` provides native TypeScript client support for AI trading agents, ElizaOS plugins, and autonomous bots to intercept swap intents, simulate execution off-chain against live RPC state, and prevent failed transactions from burning gas on Solana.
 
 ---
 
@@ -14,13 +15,13 @@
 ### Installation
 
 ```bash
-npm install @gatekeeper/solana-sdk
+npm install gatekeeper-solana-sdk
 ```
 
 ### Usage
 
 ```typescript
-import { GatekeeperClient } from "@gatekeeper/solana-sdk";
+import { GatekeeperClient } from "gatekeeper-solana-sdk";
 
 const gk = new GatekeeperClient({
   apiKey: "gk_your_production_key",

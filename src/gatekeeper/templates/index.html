@@ -429,7 +429,7 @@
         <section class="showcase" id="quickstart">
             <div class="tabs-header">
                 <button class="tab-btn active" onclick="switchTab('tab-py', this)">Python (gatekeeper-solana)</button>
-                <button class="tab-btn" onclick="switchTab('tab-ts', this)">TypeScript (@gatekeeper/solana-sdk)</button>
+                <button class="tab-btn" onclick="switchTab('tab-ts', this)">TypeScript (gatekeeper-solana-sdk)</button>
                 <button class="tab-btn" onclick="switchTab('tab-curl', this)">cURL / REST API</button>
             </div>
 
@@ -461,10 +461,10 @@ asyncio.run(main())</pre>
             <!-- TypeScript Tab -->
             <div id="tab-ts" class="tab-content">
 <pre><span class="code-comment">// 1. Install via npm</span>
-npm install @gatekeeper/solana-sdk
+npm install gatekeeper-solana-sdk
 
 <span class="code-comment">// 2. Evaluate before broadcast</span>
-<span class="code-keyword">import</span> { GatekeeperClient } <span class="code-keyword">from</span> <span class="code-string">"@gatekeeper/solana-sdk"</span>;
+<span class="code-keyword">import</span> { GatekeeperClient } <span class="code-keyword">from</span> <span class="code-string">"gatekeeper-solana-sdk"</span>;
 
 <span class="code-keyword">const</span> gk = <span class="code-keyword">new</span> GatekeeperClient({
   apiKey: process.env.GATEKEEPER_API_KEY!,
