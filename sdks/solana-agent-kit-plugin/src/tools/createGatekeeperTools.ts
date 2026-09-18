@@ -19,3 +19,14 @@ import { GatekeeperConfig, SendAIAction } from "../types";
 export function createGatekeeperTools(config?: GatekeeperConfig): SendAIAction[] {
   return [createGatekeeperPreflightAction(config)];
 }
+
+/**
+ * Solana Agent Kit v2 Plugin Wrapper
+ * Usage: agent.use(GatekeeperPlugin({ apiKey: "..." }))
+ */
+export function GatekeeperPlugin(config?: GatekeeperConfig) {
+  return {
+    name: "gatekeeper",
+    actions: [createGatekeeperPreflightAction(config)],
+  };
+}

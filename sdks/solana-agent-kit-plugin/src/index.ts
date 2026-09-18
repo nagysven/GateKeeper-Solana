@@ -1,4 +1,4 @@
-export { createGatekeeperTools } from "./tools/createGatekeeperTools";
+export { createGatekeeperTools, GatekeeperPlugin } from "./tools/createGatekeeperTools";
 export {
   createGatekeeperPreflightAction,
   GatekeeperPreflightInputSchema,
