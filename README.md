@@ -1,6 +1,7 @@
 # 🛡️ Project Gatekeeper: The Deterministic Firewall for Solana AI Agents
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![PyPI](https://img.shields.io/pypi/v/gatekeeper-solana.svg)](https://pypi.org/project/gatekeeper-solana/)
 [![Python: 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://python.org)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-blue.svg)](https://www.typescriptlang.org/)
 [![Tests: 47/47](https://img.shields.io/badge/tests-47%20passed-brightgreen.svg)](tests/)
@@ -90,19 +91,21 @@ Gatekeeper strictly enforces a **Zero-Tolerance Abort Policy**. Transactions are
 
 ---
 
-## 🚀 Quickstart: Python SDK (`gatekeeper-py`)
+## 🚀 Quickstart: Python SDK (`gatekeeper-solana`)
 
 ### 1. Installation
 
 ```bash
-pip install gatekeeper-py
+pip install gatekeeper-solana
 ```
+
+*(Note: `import gatekeeper_py` is also supported for backward compatibility).*
 
 ### 2. Protect Your Agent in 5 Lines of Code
 
 ```python
 import asyncio
-from gatekeeper_py import GatekeeperAsyncClient
+from gatekeeper_solana import GatekeeperAsyncClient
 
 async def main():
     gk = GatekeeperAsyncClient(

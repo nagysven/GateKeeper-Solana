@@ -428,19 +428,19 @@
         <!-- Code Showcase -->
         <section class="showcase" id="quickstart">
             <div class="tabs-header">
-                <button class="tab-btn active" onclick="switchTab('tab-py', this)">Python (gatekeeper-py)</button>
+                <button class="tab-btn active" onclick="switchTab('tab-py', this)">Python (gatekeeper-solana)</button>
                 <button class="tab-btn" onclick="switchTab('tab-ts', this)">TypeScript (@gatekeeper/solana-sdk)</button>
                 <button class="tab-btn" onclick="switchTab('tab-curl', this)">cURL / REST API</button>
             </div>
 
             <!-- Python Tab -->
             <div id="tab-py" class="tab-content active">
-<pre><span class="code-comment"># 1. Install via pip</span>
-pip install gatekeeper-py
+<pre><span class="code-comment"># 1. Install via PyPI</span>
+pip install gatekeeper-solana
 
 <span class="code-comment"># 2. Protect autonomous agents in 5 lines of code</span>
 <span class="code-keyword">import</span> asyncio
-<span class="code-keyword">from</span> gatekeeper_py <span class="code-keyword">import</span> GatekeeperAsyncClient
+<span class="code-keyword">from</span> gatekeeper_solana <span class="code-keyword">import</span> GatekeeperAsyncClient
 
 <span class="code-keyword">async def</span> <span class="code-func">main</span>():
     gk = GatekeeperAsyncClient(api_key=<span class="code-string">"gk_production_key"</span>, base_url=<span class="code-string">"https://gk.ai-futures-bot.pro"</span>)
