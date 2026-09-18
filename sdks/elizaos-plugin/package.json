@@ -1,5 +1,5 @@
 {
-  "name": "@gatekeeper/plugin-solana",
+  "name": "gatekeeper-plugin-solana",
   "version": "0.1.0",
   "description": "ElizaOS Plugin for Project Gatekeeper - Deterministic Pre-Flight Firewall & Gas Protection on Solana",
   "main": "dist/index.js",

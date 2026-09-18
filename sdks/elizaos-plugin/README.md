@@ -1,8 +1,8 @@
-# @gatekeeper/plugin-solana
+# gatekeeper-plugin-solana
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![ElizaOS](https://img.shields.io/badge/ElizaOS-Plugin-purple.svg)](https://github.com/elizaos/eliza)
-[![npm version](https://img.shields.io/badge/npm-v0.1.0-blue.svg)](https://www.npmjs.com/package/@gatekeeper/plugin-solana)
+[![npm version](https://img.shields.io/badge/npm-v0.1.0-blue.svg)](https://www.npmjs.com/package/gatekeeper-plugin-solana)
 
 **Deterministic Pre-Flight Transaction Security & Gas Firewall Plugin for ElizaOS AI Agents.**
 
@@ -22,12 +22,12 @@ Protect your autonomous ElizaOS agents from burning treasury SOL on failed swaps
 ## 📦 Installation
 
 ```bash
-npm install @gatekeeper/plugin-solana
+npm install gatekeeper-plugin-solana
 ```
 
 Or with `pnpm`:
 ```bash
-pnpm add @gatekeeper/plugin-solana
+pnpm add gatekeeper-plugin-solana
 ```
 
 ---

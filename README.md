@@ -2,6 +2,7 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![PyPI](https://img.shields.io/pypi/v/gatekeeper-solana.svg)](https://pypi.org/project/gatekeeper-solana/)
+[![npm: gatekeeper-solana-sdk](https://img.shields.io/npm/v/gatekeeper-solana-sdk.svg)](https://www.npmjs.com/package/gatekeeper-solana-sdk)
 [![Python: 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://python.org)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-blue.svg)](https://www.typescriptlang.org/)
 [![Tests: 47/47](https://img.shields.io/badge/tests-47%20passed-brightgreen.svg)](tests/)
@@ -202,6 +203,17 @@ Sample output:
       • On-Chain Gas Paid:  0 LAMPORT (0.00 SOL verbrannt)
       • Saved Fees & Tip:   7,556 Lamports preserved in wallet
 ```
+
+---
+
+## 📦 Official Ecosystem Packages
+
+| Ecosystem / Platform | Package Name | Registry Link | Install Command |
+| :--- | :--- | :--- | :--- |
+| **Python SDK** | `gatekeeper-solana` | [PyPI](https://pypi.org/project/gatekeeper-solana/) | `pip install gatekeeper-solana` |
+| **TypeScript SDK** | `gatekeeper-solana-sdk` | [npm](https://www.npmjs.com/package/gatekeeper-solana-sdk) | `npm install gatekeeper-solana-sdk` |
+| **Solana Agent Kit** | `gatekeeper-solana-agent-kit` | [npm](https://www.npmjs.com/package/gatekeeper-solana-agent-kit) | `npm install gatekeeper-solana-agent-kit` |
+| **ElizaOS Plugin** | `gatekeeper-plugin-solana` | [npm](https://www.npmjs.com/package/gatekeeper-plugin-solana) | `npm install gatekeeper-plugin-solana` |
 
 ---
 

@@ -1,8 +1,8 @@
-# @gatekeeper/solana-agent-kit
+# gatekeeper-solana-agent-kit
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![SendAI](https://img.shields.io/badge/SendAI-Solana--Agent--Kit-blue.svg)](https://github.com/sendaifun/solana-agent-kit)
-[![npm version](https://img.shields.io/badge/npm-v0.1.0-blue.svg)](https://www.npmjs.com/package/@gatekeeper/solana-agent-kit)
+[![npm version](https://img.shields.io/badge/npm-v0.1.0-blue.svg)](https://www.npmjs.com/package/gatekeeper-solana-agent-kit)
 
 **Deterministic Pre-Flight Transaction Security & Gas Firewall Adapter for Solana Agent Kit (SendAI).**
 
@@ -22,12 +22,12 @@ Equip autonomous AI agents using SendAI's `solana-agent-kit` with deterministic 
 ## 📦 Installation
 
 ```bash
-npm install @gatekeeper/solana-agent-kit
+npm install gatekeeper-solana-agent-kit
 ```
 
 Or with `pnpm`:
 ```bash
-pnpm add @gatekeeper/solana-agent-kit
+pnpm add gatekeeper-solana-agent-kit
 ```
 
 ---

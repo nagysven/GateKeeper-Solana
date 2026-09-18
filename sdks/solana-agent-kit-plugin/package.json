@@ -1,5 +1,5 @@
 {
-  "name": "@gatekeeper/solana-agent-kit",
+  "name": "gatekeeper-solana-agent-kit",
   "version": "0.1.0",
   "description": "Solana Agent Kit (SendAI) Adapter for Project Gatekeeper - Deterministic Pre-Flight Firewall & CU Clamping",
   "main": "dist/index.js",
