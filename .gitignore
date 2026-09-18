@@ -46,3 +46,6 @@ sdks/elizaos-plugin/node_modules/
 sdks/elizaos-plugin/dist/
 sdks/solana-agent-kit-plugin/node_modules/
 sdks/solana-agent-kit-plugin/dist/
+# Temporary & Scratch
+sendai_issue_text*
+.~lock*
