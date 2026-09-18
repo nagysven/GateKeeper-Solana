@@ -3,7 +3,7 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "gatekeeper-py"
+name = "gatekeeper-solana"
 version = "0.1.0"
 description = "Deterministic Pre-Flight Transaction Security & Firewall SDK for Solana AI Agents"
 readme = "README.md"
@@ -12,12 +12,27 @@ license = { text = "MIT" }
 authors = [
     { name = "Gatekeeper Contributors" }
 ]
-keywords = ["solana", "ai-agents", "middleware", "preflight", "mev", "firewall", "jupiter"]
+keywords = [
+    "solana",
+    "ai-agents",
+    "middleware",
+    "preflight",
+    "mev",
+    "firewall",
+    "jupiter",
+    "raydium",
+    "sendai",
+    "elizaos"
+]
 classifiers = [
     "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
     "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Security",
 ]
 dependencies = [
     "httpx>=0.25.0",
@@ -26,7 +41,9 @@ dependencies = [
 
 [project.urls]
 Homepage = "https://gk.ai-futures-bot.pro"
+Documentation = "https://github.com/nagysven/GateKeeper-Solana#readme"
 Repository = "https://github.com/nagysven/GateKeeper-Solana"
+Issues = "https://github.com/nagysven/GateKeeper-Solana/issues"
 
 [project.optional-dependencies]
 dev = [
@@ -36,4 +53,11 @@ dev = [
 ]
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/gatekeeper_py"]
+packages = ["src/gatekeeper_solana", "src/gatekeeper_py"]
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "/src",
+    "/README.md",
+    "/pyproject.toml",
+]

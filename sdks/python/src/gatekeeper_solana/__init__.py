@@ -1,18 +1,16 @@
-"""Gatekeeper Python SDK - Compatibility shim for gatekeeper_solana."""
+"""Gatekeeper Python SDK - The Deterministic Firewall for Autonomous Solana AI Agents."""
 
-from gatekeeper_solana import (
-    GatekeeperClient,
-    GatekeeperAsyncClient,
-    PreflightEvaluation,
-    SavingsMetrics,
+from .client import GatekeeperClient, GatekeeperAsyncClient
+from .models import PreflightEvaluation, SavingsMetrics
+from .exceptions import (
     GatekeeperError,
     GatekeeperAuthError,
     GatekeeperRateLimitError,
     GatekeeperConnectionError,
     GatekeeperRejectionError,
-    __version__,
 )
 
+__version__ = "0.1.0"
 __all__ = [
     "GatekeeperClient",
     "GatekeeperAsyncClient",
