@@ -368,6 +368,148 @@
             color: var(--accent-green);
             text-decoration: none;
         }
+    
+        /* Modals & Solana Pay Billing UI */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(4, 6, 10, 0.85);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .modal-overlay.active {
+            display: flex;
+        }
+        .modal-card {
+            background: #111318;
+            border: 1px solid rgba(20, 241, 149, 0.35);
+            box-shadow: 0 0 40px rgba(20, 241, 149, 0.15), 0 20px 40px rgba(0,0,0,0.8);
+            border-radius: 18px;
+            width: 100%;
+            max-width: 520px;
+            padding: 32px;
+            position: relative;
+            color: var(--text-main);
+            animation: modalIn 0.25s ease-out;
+        }
+        @keyframes modalIn {
+            from { transform: scale(0.95); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+        .modal-close {
+            position: absolute;
+            top: 20px; right: 20px;
+            background: none; border: none;
+            color: var(--text-muted);
+            font-size: 22px; cursor: pointer;
+            transition: color 0.2s;
+        }
+        .modal-close:hover { color: #fff; }
+        .modal-title {
+            font-size: 22px; font-weight: 800; margin-bottom: 6px;
+            display: flex; align-items: center; gap: 10px;
+        }
+        .modal-subtitle {
+            color: var(--text-muted); font-size: 14px; margin-bottom: 24px;
+        }
+        .form-group {
+            margin-bottom: 18px;
+        }
+        .form-label {
+            display: block; font-size: 13px; font-weight: 600;
+            color: var(--text-muted); margin-bottom: 6px;
+            text-transform: uppercase; letter-spacing: 0.5px;
+        }
+        .form-input {
+            width: 100%;
+            background: #060709;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            color: #fff;
+            padding: 12px 14px;
+            border-radius: 8px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 14px;
+            transition: border-color 0.2s;
+        }
+        .form-input:focus {
+            outline: none;
+            border-color: var(--accent-green);
+        }
+        .currency-selector {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        .currency-card {
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            background: #0c0e14;
+            border-radius: 10px;
+            padding: 14px;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s;
+        }
+        .currency-card.active {
+            border-color: var(--accent-green);
+            background: rgba(20, 241, 149, 0.08);
+            box-shadow: 0 0 15px rgba(20, 241, 149, 0.2);
+        }
+        .currency-card .curr-name {
+            font-weight: 800; font-size: 16px; margin-bottom: 4px;
+        }
+        .currency-card .curr-price {
+            font-size: 13px; color: var(--accent-green); font-family: 'JetBrains Mono', monospace;
+        }
+        .currency-card .curr-checks {
+            font-size: 11px; color: var(--text-muted); margin-top: 4px;
+        }
+        .key-display-box {
+            background: #060709;
+            border: 1px solid rgba(20, 241, 149, 0.3);
+            border-radius: 10px;
+            padding: 16px;
+            margin-top: 20px;
+            position: relative;
+        }
+        .key-token-val {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 14px;
+            color: var(--accent-green);
+            word-break: break-all;
+            margin-bottom: 10px;
+        }
+        .qr-wrapper {
+            background: #fff;
+            padding: 16px;
+            border-radius: 12px;
+            display: inline-block;
+            margin: 20px auto;
+            text-align: center;
+        }
+        .polling-status {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-size: 13px;
+            color: #d8b4fe;
+            margin-top: 14px;
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .spinner {
+            width: 14px; height: 14px;
+            border: 2px solid rgba(153, 69, 255, 0.3);
+            border-top-color: #d8b4fe;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
     </style>
 </head>
 <body>
@@ -379,6 +521,8 @@
                 <div class="logo-text">PROJECT <span>GATEKEEPER</span></div>
             </a>
             <div class="header-links">
+                <a href="#" onclick="openApiKeyModal(); return false;" class="nav-link" style="color: var(--accent-green); font-weight:700;">🔑 Free API Key</a>
+                <a href="#" onclick="openTopUpModal(); return false;" class="nav-link" style="color: #d8b4fe; font-weight:700;">⚡ Solana Pay</a>
                 <a href="/docs" class="nav-link">API Docs</a>
                 <a href="https://github.com/nagysven/GateKeeper-Solana" target="_blank" class="nav-link">GitHub</a>
                 <div class="status-pill">
@@ -394,8 +538,9 @@
             <h1>The Deterministic Firewall for<br><span class="gradient-text">Autonomous Solana Agents</span></h1>
             <p>Every autonomous AI agent signing raw Solana transactions burns 8–15% of its capital on slippage spikes, DEX reverts (<code>0x1771</code>), and account contention. Gatekeeper guarantees zero gas burned on failed trades.</p>
             <div class="hero-actions">
-                <a href="#quickstart" class="btn btn-primary">Start Integration</a>
-                <a href="/docs" class="btn btn-secondary">OpenAPI Specification</a>
+                <a href="#" onclick="openApiKeyModal(); return false;" class="btn btn-primary">🔑 Get Free API Key</a>
+                <a href="#" onclick="openTopUpModal(); return false;" class="btn btn-secondary" style="border-color: rgba(153,69,255,0.4); color: #d8b4fe;">⚡ Top-Up Credits</a>
+                <a href="/docs" class="btn btn-secondary">OpenAPI Specs</a>
             </div>
         </section>
 
@@ -506,7 +651,7 @@ curl -s -X POST https://gk.ai-futures-bot.pro/api/v1/preflight \
                 <h3>Free Tier: 10,000 Pre-Flight Checks / Month</h3>
                 <p>Equip your ElizaOS or Solana Agent Kit bots with real-time pre-flight protection. 5 req/s burst limit included at no cost.</p>
             </div>
-            <a href="/docs" class="btn btn-primary">Get API Key</a>
+            <a href="#" onclick="openApiKeyModal(); return false;" class="btn btn-primary">🔑 Claim 10k Free Checks</a>
         </div>
 
         <!-- Footer -->
@@ -556,5 +701,254 @@ curl -s -X POST https://gk.ai-futures-bot.pro/api/v1/preflight \
         fetchLiveMetrics();
         setInterval(fetchLiveMetrics, 15000);
     </script>
+
+    <!-- Modal 1: Generate API Key -->
+    <div id="modal-apikey" class="modal-overlay">
+        <div class="modal-card">
+            <button class="modal-close" onclick="closeApiKeyModal()">&times;</button>
+            <div class="modal-title">🔑 Developer API Key</div>
+            <div class="modal-subtitle">Instantly activate Free Tier with 10,000 pre-flight checks / month.</div>
+
+            <div id="apikey-form-view">
+                <div class="form-group">
+                    <label class="form-label">Agent / Project Name</label>
+                    <input type="text" id="reg-client-name" class="form-input" placeholder="e.g. My Autonomous Agent" value="Autonomous Agent">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Solana Wallet Address (Optional)</label>
+                    <input type="text" id="reg-owner-wallet" class="form-input" placeholder="e.g. 9XdA2scpuFoxtbv74wPhcgghftV56vdY9SsdrFKgxjgw">
+                </div>
+                <button onclick="submitRegisterKey()" id="btn-reg-key" class="btn btn-primary" style="width:100%; justify-content:center; margin-top:8px;">
+                    Generate Free API Key
+                </button>
+            </div>
+
+            <div id="apikey-result-view" style="display:none;">
+                <div class="key-display-box">
+                    <div style="font-size:12px; color:var(--text-muted); margin-bottom:4px;">YOUR API KEY:</div>
+                    <div class="key-token-val" id="res-key-val">gk_live_...</div>
+                    <button onclick="copyKeyToClipboard()" class="btn btn-secondary" style="padding:6px 12px; font-size:12px;">
+                        📋 Copy Key
+                    </button>
+                </div>
+                <div style="margin-top:16px; font-size:13px; color:var(--text-muted); line-height:1.5;">
+                    ✅ Monthly Quota: <strong style="color:#fff;">10,000 checks</strong><br>
+                    ✅ Rate Limit: <strong style="color:#fff;">5 req/sec burst</strong><br>
+                    Add this key in your HTTP header: <code style="color:var(--accent-green);">X-Gatekeeper-Key</code>
+                </div>
+                <button onclick="openTopUpModalWithKey()" class="btn btn-secondary" style="width:100%; justify-content:center; margin-top:20px; border-color: rgba(153,69,255,0.4); color:#d8b4fe;">
+                    ⚡ Top Up with Solana Pay (+50,000 checks)
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal 2: Solana Pay Top-Up -->
+    <div id="modal-topup" class="modal-overlay">
+        <div class="modal-card">
+            <button class="modal-close" onclick="closeTopUpModal()">&times;</button>
+            <div class="modal-title">⚡ Solana Pay Top-Up</div>
+            <div class="modal-subtitle">Instant on-chain settlement. Adds +50,000 pre-flight checks per top-up.</div>
+
+            <div id="topup-form-view">
+                <div class="form-group">
+                    <label class="form-label">Target API Key</label>
+                    <input type="text" id="topup-key-id" class="form-input" placeholder="gk_live_...">
+                </div>
+                <div class="form-label" style="margin-bottom:8px;">Select Payment Option</div>
+                <div class="currency-selector">
+                    <div class="currency-card active" id="card-sol" onclick="selectCurrency('SOL')">
+                        <div class="curr-name">SOL</div>
+                        <div class="curr-price">0.05 SOL</div>
+                        <div class="curr-checks">+50,000 Checks</div>
+                    </div>
+                    <div class="currency-card" id="card-usdc" onclick="selectCurrency('USDC')">
+                        <div class="curr-name">USDC</div>
+                        <div class="curr-price">10.00 USDC</div>
+                        <div class="curr-checks">+50,000 Checks</div>
+                    </div>
+                </div>
+                <button onclick="submitCreateCheckout()" id="btn-create-checkout" class="btn btn-primary" style="width:100%; justify-content:center;">
+                    Generate Solana Pay Request
+                </button>
+            </div>
+
+            <div id="topup-checkout-view" style="display:none; text-align:center;">
+                <div style="font-size:13px; color:var(--text-muted); margin-bottom:8px;">Scan with Phantom, Solflare or any Solana Pay wallet:</div>
+                <div class="qr-wrapper">
+                    <div id="qrcode-container"></div>
+                </div>
+                <div style="margin: 10px 0;">
+                    <a id="solana-pay-deeplink" href="#" class="btn btn-primary" style="font-size:13px; padding:10px 18px;">
+                        Open in Solana Wallet
+                    </a>
+                </div>
+                <div style="font-size:12px; color:var(--text-muted); font-family:'JetBrains Mono', monospace; margin-top:8px;">
+                    Amount: <span id="chk-amount" style="color:#fff; font-weight:700;"></span> | Reference: <span id="chk-ref" style="color:#d8b4fe;"></span>
+                </div>
+                <div class="polling-status" id="poll-indicator">
+                    <div class="spinner"></div>
+                    <span>Awaiting on-chain confirmation...</span>
+                </div>
+            </div>
+
+            <div id="topup-success-view" style="display:none; text-align:center; padding:20px 0;">
+                <div style="font-size:48px; margin-bottom:12px;">🎉</div>
+                <div style="font-size:20px; font-weight:800; color:var(--accent-green); margin-bottom:8px;">Payment Confirmed!</div>
+                <div style="font-size:14px; color:var(--text-muted); margin-bottom:20px;">
+                    Successfully added <strong style="color:#fff;">+50,000 checks</strong> to your API key.<br>
+                    Total Remaining Checks: <span id="succ-remaining" style="color:var(--accent-green); font-weight:800; font-family:'JetBrains Mono';"></span>
+                </div>
+                <button onclick="closeTopUpModal()" class="btn btn-secondary" style="padding:10px 24px;">Done</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- QR Code Library -->
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+
+    <script>
+        let selectedCurrency = 'SOL';
+        let currentCheckoutRef = null;
+        let pollTimer = null;
+
+        function openApiKeyModal() {
+            document.getElementById('modal-apikey').classList.add('active');
+        }
+        function closeApiKeyModal() {
+            document.getElementById('modal-apikey').classList.remove('active');
+        }
+        function openTopUpModal() {
+            const savedKey = localStorage.getItem('gatekeeper_api_key');
+            if (savedKey) {
+                document.getElementById('topup-key-id').value = savedKey;
+            }
+            document.getElementById('topup-form-view').style.display = 'block';
+            document.getElementById('topup-checkout-view').style.display = 'none';
+            document.getElementById('topup-success-view').style.display = 'none';
+            document.getElementById('modal-topup').classList.add('active');
+        }
+        function openTopUpModalWithKey() {
+            closeApiKeyModal();
+            openTopUpModal();
+        }
+        function closeTopUpModal() {
+            if (pollTimer) clearInterval(pollTimer);
+            document.getElementById('modal-topup').classList.remove('active');
+        }
+
+        function selectCurrency(curr) {
+            selectedCurrency = curr;
+            document.querySelectorAll('.currency-card').forEach(c => c.classList.remove('active'));
+            document.getElementById('card-' + curr.toLowerCase()).classList.add('active');
+        }
+
+        async function submitRegisterKey() {
+            const clientName = document.getElementById('reg-client-name').value || 'Autonomous Agent';
+            const ownerWallet = document.getElementById('reg-owner-wallet').value || null;
+            const btn = document.getElementById('btn-reg-key');
+            btn.disabled = true;
+            btn.textContent = 'Generating...';
+
+            try {
+                const res = await fetch('/api/v1/billing/keys/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ client_name: clientName, owner_wallet: ownerWallet })
+                });
+                if (!res.ok) throw new Error('Registration failed');
+                const data = await res.json();
+                localStorage.setItem('gatekeeper_api_key', data.key_id);
+                document.getElementById('res-key-val').textContent = data.key_id;
+                document.getElementById('apikey-form-view').style.display = 'none';
+                document.getElementById('apikey-result-view').style.display = 'block';
+            } catch (err) {
+                alert('Could not register API key: ' + err.message);
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Generate Free API Key';
+            }
+        }
+
+        function copyKeyToClipboard() {
+            const key = document.getElementById('res-key-val').textContent;
+            navigator.clipboard.writeText(key).then(() => {
+                alert('API key copied to clipboard: ' + key);
+            });
+        }
+
+        async function submitCreateCheckout() {
+            const keyId = document.getElementById('topup-key-id').value.trim();
+            if (!keyId) {
+                alert('Please enter your API Key');
+                return;
+            }
+            const btn = document.getElementById('btn-create-checkout');
+            btn.disabled = true;
+            btn.textContent = 'Creating Request...';
+
+            try {
+                const res = await fetch('/api/v1/billing/checkout', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ key_id: keyId, currency: selectedCurrency })
+                });
+                if (!res.ok) {
+                    const err = await res.json();
+                    throw new Error(err.detail || 'Checkout failed');
+                }
+                const data = await res.json();
+                currentCheckoutRef = data.reference;
+
+                document.getElementById('topup-form-view').style.display = 'none';
+                document.getElementById('topup-checkout-view').style.display = 'block';
+                document.getElementById('chk-amount').textContent = data.amount + ' ' + data.currency;
+                document.getElementById('chk-ref').textContent = data.reference.slice(0, 6) + '...' + data.reference.slice(-4);
+                document.getElementById('solana-pay-deeplink').href = data.solana_pay_url;
+
+                // Render QR code
+                const qrContainer = document.getElementById('qrcode-container');
+                qrContainer.innerHTML = '';
+                new QRCode(qrContainer, {
+                    text: data.solana_pay_url,
+                    width: 180,
+                    height: 180,
+                    colorDark: '#000000',
+                    colorLight: '#ffffff',
+                    correctLevel: QRCode.CorrectLevel.M
+                });
+
+                // Start polling verification
+                if (pollTimer) clearInterval(pollTimer);
+                pollTimer = setInterval(pollPaymentStatus, 3000);
+
+            } catch (err) {
+                alert('Error creating Solana Pay checkout: ' + err.message);
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Generate Solana Pay Request';
+            }
+        }
+
+        async function pollPaymentStatus() {
+            if (!currentCheckoutRef) return;
+            try {
+                const res = await fetch('/api/v1/billing/checkout/' + currentCheckoutRef + '/verify');
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data.confirmed) {
+                        clearInterval(pollTimer);
+                        pollTimer = null;
+                        document.getElementById('topup-checkout-view').style.display = 'none';
+                        document.getElementById('topup-success-view').style.display = 'block';
+                        document.getElementById('succ-remaining').textContent = Number(data.total_remaining_checks || 50000).toLocaleString();
+                    }
+                }
+            } catch (err) {
+                console.log('Polling verify error:', err);
+            }
+        }
+    </script>
+
 </body>
 </html>

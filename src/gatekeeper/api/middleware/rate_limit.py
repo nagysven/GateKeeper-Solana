@@ -106,7 +106,7 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
     ) -> Response:
         # Exempt public routes
         path = request.url.path
-        if path in self.exempt_paths:
+        if path in self.exempt_paths or path.startswith('/api/v1/billing'):
             return await call_next(request)
 
         client_key = self._get_client_key(request)

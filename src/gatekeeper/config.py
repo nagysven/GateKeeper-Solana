@@ -26,6 +26,30 @@ class Settings(BaseSettings):
         default="gk-sec-master-key-change-in-prod",
         description="Master API key required for X-Gatekeeper-Key header authentication.",
     )
+    TREASURY_WALLET_ADDRESS: str = Field(
+        default="9XdA2scpuFoxtbv74wPhcgghftV56vdY9SsdrFKgxjgw",
+        description="Solana treasury wallet address for receiving billing payments.",
+    )
+    USDC_MINT_ADDRESS: str = Field(
+        default="EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+        description="Solana Mainnet USDC SPL token mint address.",
+    )
+    TOPUP_USDC_PRICE: float = Field(
+        default=10.0,
+        description="Price in USDC for top-up credit package.",
+    )
+    TOPUP_SOL_PRICE: float = Field(
+        default=0.05,
+        description="Price in SOL for top-up credit package.",
+    )
+    TOPUP_CREDITS: int = Field(
+        default=50_000,
+        description="Number of pre-flight checks credited per payment package.",
+    )
+    FREE_TIER_MONTHLY_QUOTA: int = Field(
+        default=10_000,
+        description="Default monthly request allowance for free-tier developer keys.",
+    )
 
     # Solana Network & RPC Configuration
     RPC_URL: str = Field(

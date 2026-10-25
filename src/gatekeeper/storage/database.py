@@ -79,9 +79,40 @@ CREATE TABLE IF NOT EXISTS fee_savings_ledger (
     FOREIGN KEY(intent_id) REFERENCES intents(intent_id)
 );
 
+-- 5. API Keys Table (Free Tier & Paid Tiers)
+CREATE TABLE IF NOT EXISTS api_keys (
+    key_id TEXT PRIMARY KEY,
+    client_name TEXT NOT NULL DEFAULT 'Developer',
+    owner_wallet TEXT,
+    monthly_quota INTEGER NOT NULL DEFAULT 10000,
+    bonus_credits INTEGER NOT NULL DEFAULT 0,
+    used_this_month INTEGER NOT NULL DEFAULT 0,
+    current_month TEXT NOT NULL,
+    is_active BOOLEAN NOT NULL DEFAULT 1,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- 6. Solana Pay Payments Table
+CREATE TABLE IF NOT EXISTS payment_transactions (
+    payment_id TEXT PRIMARY KEY,
+    key_id TEXT NOT NULL,
+    reference TEXT UNIQUE NOT NULL,
+    recipient TEXT NOT NULL,
+    amount REAL NOT NULL,
+    currency TEXT NOT NULL,
+    credits_granted INTEGER NOT NULL,
+    status TEXT NOT NULL DEFAULT 'PENDING',
+    signature TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    confirmed_at TIMESTAMP,
+    FOREIGN KEY(key_id) REFERENCES api_keys(key_id)
+);
+
 CREATE INDEX IF NOT EXISTS idx_intents_agent ON intents(agent_id);
 CREATE INDEX IF NOT EXISTS idx_simulations_candidate ON simulations(candidate_id);
 CREATE INDEX IF NOT EXISTS idx_savings_action ON fee_savings_ledger(action_taken);
+CREATE INDEX IF NOT EXISTS idx_payments_ref ON payment_transactions(reference);
+CREATE INDEX IF NOT EXISTS idx_payments_key ON payment_transactions(key_id);
 """
 
 

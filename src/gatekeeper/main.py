@@ -9,11 +9,14 @@ from fastapi.responses import HTMLResponse, JSONResponse
 
 from gatekeeper.api.middleware.rate_limit import RateLimitMiddleware
 from gatekeeper.api.v1 import api_v1_router
+from gatekeeper.api.v1.billing import router as billing_router
 from gatekeeper.config import settings
 from gatekeeper.engine.arbitrator import GatekeeperArbitrator
 from gatekeeper.engine.candidate_generator import RouteCandidateGenerator
 from gatekeeper.engine.simulator import PreFlightSimulator
 from gatekeeper.storage.database import DatabaseManager
+from gatekeeper.billing.solana_pay import SolanaPayService
+from gatekeeper.storage.billing_repository import BillingRepository
 from gatekeeper.storage.repository import AuditLedgerRepository
 
 logging.basicConfig(
@@ -33,6 +36,8 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     # Attach core instances to application state
     app.state.db_manager = db_manager
     app.state.repository = AuditLedgerRepository(db_manager)
+    app.state.billing_repo = BillingRepository(db_manager, settings)
+    app.state.solana_pay_service = SolanaPayService(app.state.billing_repo, settings)
     app.state.simulator = PreFlightSimulator(config=settings)
     app.state.arbitrator = GatekeeperArbitrator(config=settings)
     app.state.candidate_generator = RouteCandidateGenerator(config=settings)
@@ -68,6 +73,7 @@ app.add_middleware(
 
 # Register API v1 routes
 app.include_router(api_v1_router)
+app.include_router(billing_router, prefix="/api/v1")
 
 TEMPLATES_DIR = Path(__file__).parent / "templates"
 
@@ -84,11 +90,9 @@ async def developer_portal():
 @app.get("/api/v1/public/metrics", tags=["Metrics"])
 async def public_savings_metrics(request: Request):
     """Public unauthenticated savings metrics endpoint for the landing page showcase."""
-    if hasattr(request.app.state, "repository"):
+    if hasattr(request.app.state, "repository") and request.app.state.repository:
         repo = request.app.state.repository
     else:
-        from gatekeeper.storage.database import DatabaseManager
-        from gatekeeper.storage.repository import AuditLedgerRepository
         repo = AuditLedgerRepository(DatabaseManager())
     return await repo.get_savings_metrics()
 
