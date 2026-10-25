@@ -1,15 +1,29 @@
-# 🛡️ Project Gatekeeper: The Deterministic Firewall for Solana AI Agents
+# 🛡️ Project Gatekeeper: Non-Custodial Execution Firewall & Security Layer for Solana AI Agents
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![PyPI](https://img.shields.io/pypi/v/gatekeeper-solana.svg)](https://pypi.org/project/gatekeeper-solana/)
 [![npm: gatekeeper-solana-sdk](https://img.shields.io/npm/v/gatekeeper-solana-sdk.svg)](https://www.npmjs.com/package/gatekeeper-solana-sdk)
 [![Python: 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://python.org)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-blue.svg)](https://www.typescriptlang.org/)
-[![Tests: 47/47](https://img.shields.io/badge/tests-47%20passed-brightgreen.svg)](tests/)
+[![Tests: 50/50](https://img.shields.io/badge/tests-50%20passed-brightgreen.svg)](tests/)
+[![Security: Non-Custodial](https://img.shields.io/badge/Security-Non--Custodial-blue.svg)](https://gk.ai-futures-bot.pro)
+[![Billing: Solana Pay](https://img.shields.io/badge/Billing-Solana%20Pay%20Verified-14F195.svg)](https://gk.ai-futures-bot.pro)
 [![Gateway: Live](https://img.shields.io/badge/Gateway-gk.ai--futures--bot.pro-green.svg)](https://gk.ai-futures-bot.pro)
 
-> **Every autonomous AI agent signing raw Solana transactions burns 8–15% of its capital on slippage spikes, DEX reverts (`0x1771`), and account contention.**  
-> **Gatekeeper intercepts every intent before broadcast and guarantees ZERO gas burned on failed trades.**
+> **Autonomous AI agents signing raw Solana transactions risk catastrophic capital loss from hallucinations, toxic slippage spikes, and DEX reverts (`0x1771`).**  
+> **Gatekeeper provides an objective, non-custodial execution firewall between the agent's decision and the wallet signature — guaranteeing deterministic execution, capital protection, and ZERO gas burned on failed trades.**
+
+---
+
+## 🏛️ Core Security Pillars
+
+| Pillar | Capability | Developer & Agent Impact |
+| :--- | :--- | :--- |
+| 🛡️ **Anti-Hallucination Guardrails** | Enforces hard constraints on trade size, max slippage, and balance integrity | Prevents runaway LLM agents from draining wallets into toxic or illiquid pools |
+| ⚡ **Zero-Gas Revert Shield** | Pre-flight off-chain simulation against live cluster state in `<80ms` | Intercepts DEX reverts (`0x1771`, `AccountInUse`) before broadcast — 0 Lamports burned |
+| 🔒 **100% Non-Custodial** | Private keys NEVER touch Gatekeeper | The agent holds keys locally; Gatekeeper objectively validates unsigned/signed intents |
+| 🎯 **Dynamic CU Clamping** | Clamps 200,000 CU swap budgets down to `Simulated CU * 1.12` (~49k CU) | Eliminates wasted Compute Units and drastically lowers Priority Fee exposure |
+| 💳 **Solana Pay Micro-Billing** | Instant self-service API key registration with Free Tier (10,000 checks/month) | Autonomous agents top up +50k checks on-chain with SOL (0.05 SOL) or USDC (10 USDC) |
 
 ---
 

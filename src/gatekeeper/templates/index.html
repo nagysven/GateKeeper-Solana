@@ -534,9 +534,9 @@
 
         <!-- Hero -->
         <section class="hero">
-            <div class="hero-badge">⚡ Sub-80ms Off-Chain Arbitration</div>
-            <h1>The Deterministic Firewall for<br><span class="gradient-text">Autonomous Solana Agents</span></h1>
-            <p>Every autonomous AI agent signing raw Solana transactions burns 8–15% of its capital on slippage spikes, DEX reverts (<code>0x1771</code>), and account contention. Gatekeeper guarantees zero gas burned on failed trades.</p>
+            <div class="hero-badge">🛡️ Non-Custodial Security & Policy Firewall</div>
+            <h1>The Execution Firewall for<br><span class="gradient-text">Autonomous Solana Agents</span></h1>
+            <p>Autonomous AI agents signing raw Solana transactions risk catastrophic capital loss from hallucinations, toxic slippage spikes, and DEX reverts (<code>0x1771</code>). Gatekeeper sits between your agent's decision and the wallet signature — guaranteeing deterministic execution, capital protection, and zero gas burned on failed trades.</p>
             <div class="hero-actions">
                 <a href="#" onclick="openApiKeyModal(); return false;" class="btn btn-primary">🔑 Get Free API Key</a>
                 <a href="#" onclick="openTopUpModal(); return false;" class="btn btn-secondary" style="border-color: rgba(153,69,255,0.4); color: #d8b4fe;">⚡ Top-Up Credits</a>
@@ -566,6 +566,36 @@
                     <div class="metric-label">Average Latency</div>
                     <div class="metric-value" id="val-latency">--</div>
                     <div class="metric-sub">Off-chain simulation round-trip</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Core Pillars Section -->
+        <section style="margin-bottom: 70px;">
+            <div style="text-align: center; margin-bottom: 36px;">
+                <h2 style="font-size: 28px; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 10px;">Deterministic Security & Policy Architecture</h2>
+                <p style="color: var(--text-muted); font-size: 15px; max-width: 620px; margin: 0 auto;">Gatekeeper creates an impenetrable barrier between AI agent logic and on-chain capital allocation.</p>
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
+                <div class="metric-card">
+                    <div style="font-size: 28px; margin-bottom: 12px;">🛡️</div>
+                    <div style="font-size: 17px; font-weight: 700; color: #fff; margin-bottom: 8px;">Anti-Hallucination Guardrails</div>
+                    <div style="font-size: 13.5px; color: var(--text-muted); line-height: 1.5;">Enforces strict max trade sizes, slippage bounds, and token balance integrity. If the agent hallucinates a toxic swap, Gatekeeper drops it instantly.</div>
+                </div>
+                <div class="metric-card">
+                    <div style="font-size: 28px; margin-bottom: 12px;">⚡</div>
+                    <div style="font-size: 17px; font-weight: 700; color: #fff; margin-bottom: 8px;">Zero-Gas Revert Intercept</div>
+                    <div style="font-size: 13.5px; color: var(--text-muted); line-height: 1.5;">Off-chain pre-flight simulations against real-time cluster state detect DEX reverts (0x1771) and pool locks in &lt;80ms before any transaction is broadcast.</div>
+                </div>
+                <div class="metric-card">
+                    <div style="font-size: 28px; margin-bottom: 12px;">🔒</div>
+                    <div style="font-size: 17px; font-weight: 700; color: #fff; margin-bottom: 8px;">100% Non-Custodial Security</div>
+                    <div style="font-size: 13.5px; color: var(--text-muted); line-height: 1.5;">Private keys NEVER touch Gatekeeper. Your agent keeps its keys in its own secure environment — Gatekeeper evaluates unsigned intents objectively.</div>
+                </div>
+                <div class="metric-card">
+                    <div style="font-size: 28px; margin-bottom: 12px;">🎯</div>
+                    <div style="font-size: 17px; font-weight: 700; color: #fff; margin-bottom: 8px;">Dynamic CU Clamping</div>
+                    <div style="font-size: 13.5px; color: var(--text-muted); line-height: 1.5;">Automatically clamps over-provisioned 200,000 CU swap budgets down to the simulated requirement (* 1.12x), saving ~150k CU per trade.</div>
                 </div>
             </div>
         </section>
