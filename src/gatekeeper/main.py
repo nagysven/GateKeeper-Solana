@@ -5,7 +5,7 @@ from typing import AsyncGenerator
 from pathlib import Path
 
 from fastapi import FastAPI, Request, status
-from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.responses import HTMLResponse, JSONResponse, PlainTextResponse, Response
 
 from gatekeeper.api.middleware.rate_limit import RateLimitMiddleware
 from gatekeeper.api.v1 import api_v1_router
@@ -85,6 +85,34 @@ async def developer_portal():
     if html_file.exists():
         return HTMLResponse(content=html_file.read_text(encoding="utf-8"))
     return HTMLResponse(content="<h1>Project Gatekeeper Gateway</h1>")
+
+
+@app.get("/llms.txt", response_class=PlainTextResponse, tags=["GEO & AI"])
+@app.get("/llms-full.txt", response_class=PlainTextResponse, tags=["GEO & AI"])
+async def llms_txt():
+    """Standardized LLM documentation file for AI agents, Perplexity & search engines."""
+    file_path = TEMPLATES_DIR / "llms.txt"
+    if file_path.exists():
+        return PlainTextResponse(content=file_path.read_text(encoding="utf-8"))
+    return PlainTextResponse(content="# Project Gatekeeper\nExecution Firewall for Solana AI Agents.")
+
+
+@app.get("/robots.txt", response_class=PlainTextResponse, tags=["SEO"])
+async def robots_txt():
+    """Robots.txt granting access to search engines and AI web crawlers."""
+    file_path = TEMPLATES_DIR / "robots.txt"
+    if file_path.exists():
+        return PlainTextResponse(content=file_path.read_text(encoding="utf-8"))
+    return PlainTextResponse(content="User-agent: *\nAllow: /\n")
+
+
+@app.get("/sitemap.xml", tags=["SEO"])
+async def sitemap_xml():
+    """XML sitemap indexing key pages for search engines."""
+    file_path = TEMPLATES_DIR / "sitemap.xml"
+    if file_path.exists():
+        return Response(content=file_path.read_text(encoding="utf-8"), media_type="application/xml")
+    return Response(content="<urlset xmlns='http://www.sitemaps.org/schemas/sitemap/0.9'></urlset>", media_type="application/xml")
 
 
 @app.get("/api/v1/public/metrics", tags=["Metrics"])

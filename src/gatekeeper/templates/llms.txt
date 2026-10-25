@@ -1,0 +1,75 @@
+# Project Gatekeeper
+
+> Deterministic execution firewall and pre-flight simulation security layer for autonomous Solana AI agents.
+
+Project Gatekeeper provides an objective, non-custodial execution firewall between an autonomous agent's decision logic (e.g. ElizaOS, Solana Agent Kit / SendAI) and wallet signature. It intercepts swap intents off-chain, performs pre-flight simulations against real-time Solana cluster state in under 80ms, aborts failing transactions (such as DEX slippage 0x1771, account contention, or expired blockhashes) before broadcast, and dynamically clamps over-provisioned Compute Unit (CU) limits.
+
+## Key Capabilities & Security Guarantees
+- Zero Gas Burned on Failed Trades: Intercepts and drops transactions off-chain before on-chain submission, preventing gas loss.
+- Anti-Hallucination Guardrails: Prevents autonomous agents from executing toxic, illiquid, or excessive trades.
+- Dynamic CU Clamping: Optimizes compute budgets from 200,000 CU down to Simulated CU * 1.12 (~49,000 CU), drastically lowering priority fees.
+- 100% Non-Custodial: Gatekeeper never holds private keys or funds. The agent keeps keys strictly local.
+- High-Speed Micro-Billing: Free Tier (10,000 pre-flight checks/month) + instant on-chain top-ups with Solana Pay (0.05 SOL or 10 USDC for +50,000 checks).
+
+## Official Packages
+- Python SDK: pip install gatekeeper-solana (PyPI: https://pypi.org/project/gatekeeper-solana/)
+- TypeScript SDK: npm install gatekeeper-solana-sdk (npm: https://www.npmjs.com/package/gatekeeper-solana-sdk)
+- Solana Agent Kit Plugin: npm install @gatekeeper/solana-agent-kit
+- ElizaOS Plugin: npm install @gatekeeper/plugin-solana
+
+## Quickstart Examples
+
+### Python (gatekeeper-solana)
+```python
+import asyncio
+from gatekeeper_solana import GatekeeperAsyncClient
+
+async def main():
+    gk = GatekeeperAsyncClient(api_key="gk_live_...", base_url="https://gk.ai-futures-bot.pro")
+    verdict = await gk.evaluate_intent(
+        token_in="So11111111111111111111111111111111111111112",   # SOL
+        token_out="EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",  # USDC
+        amount_in=100_000_000,                                   # 0.1 SOL
+        max_slippage_bps=50,                                     # 0.50%
+    )
+    if verdict.is_approved:
+        print(f"Approved in {verdict.execution_time_ms}ms! Route: {verdict.selected_route}")
+    else:
+        print(f"HARD_ABORT: {verdict.rejection_reason} - 0 Gas Burned!")
+
+asyncio.run(main())
+```
+
+### TypeScript (gatekeeper-solana-sdk)
+```typescript
+import { GatekeeperClient } from "gatekeeper-solana-sdk";
+
+const gk = new GatekeeperClient({
+  apiKey: process.env.GATEKEEPER_API_KEY!,
+  baseUrl: "https://gk.ai-futures-bot.pro"
+});
+
+const verdict = await gk.evaluateIntent({
+  token_in: "So11111111111111111111111111111111111111112",
+  token_out: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+  amount_in: 100000000,
+  max_slippage_bps: 50,
+});
+```
+
+## API Reference
+- Production Endpoint: https://gk.ai-futures-bot.pro
+- Interactive OpenAPI Docs: https://gk.ai-futures-bot.pro/docs
+- Key Endpoints:
+  - POST /api/v1/preflight: Evaluates transaction intents, simulates execution, and clamps CU limits.
+  - POST /api/v1/billing/keys/register: Instantly registers a developer API key with 10k free checks/month.
+  - GET /api/v1/billing/keys/{key_id}/status: Fetches remaining balance and quota.
+  - POST /api/v1/billing/checkout: Creates a Solana Pay payment request (SOL/USDC) for +50k checks.
+  - GET /api/v1/billing/checkout/{reference}/verify: On-chain payment verification.
+  - GET /api/v1/public/metrics: Real-time public savings ledger (total evaluations, CUs saved, fees preserved).
+
+## Official Links
+- GitHub: https://github.com/nagysven/GateKeeper-Solana
+- Developer Portal: https://gk.ai-futures-bot.pro
+- Superteam Earn Profile: https://earn.superteam.fun/@o_Hypnotist_o
+- License: MIT License

@@ -1,0 +1,18 @@
+User-agent: *
+Allow: /
+Sitemap: https://gk.ai-futures-bot.pro/sitemap.xml
+
+User-agent: GPTBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
