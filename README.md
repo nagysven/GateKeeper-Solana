@@ -242,6 +242,21 @@ Every design decision is documented and auditable:
 
 ---
 
+## 💬 Community & Developer Feedback
+
+We are actively building Gatekeeper in the open to protect autonomous agents across the Solana ecosystem. We'd love to hear from bot creators, trading firms, and AI agent developers:
+
+- **What failure modes are you seeing most often?** (e.g. slippage spikes, blockhash timeouts, account contention)
+- **Would a pre-flight execution firewall fit into your current trading pipeline?**
+- **What would you need to see before trusting it with a live trading bot?**
+
+👉 **Join the discussion & share feedback:**
+- 🐛 [Open an Issue or Feedback Thread on GitHub](https://github.com/nagysven/GateKeeper-Solana/issues)
+- 📖 [Explore OpenAPI Specs & Live Testnet Gateway](https://gk.ai-futures-bot.pro/docs)
+- 🤝 [Connect on Superteam Earn Profile](https://earn.superteam.fun/@o_Hypnotist_o)
+
+---
+
 ## 📜 License
 
 Project Gatekeeper is open source under the [MIT License](LICENSE).
