@@ -5,7 +5,7 @@ from typing import AsyncGenerator
 from pathlib import Path
 
 from fastapi import FastAPI, Request, status
-from fastapi.responses import HTMLResponse, JSONResponse, PlainTextResponse, Response
+from fastapi.responses import FileResponse, HTMLResponse, JSONResponse, PlainTextResponse, Response
 
 from gatekeeper.api.middleware.rate_limit import RateLimitMiddleware
 from gatekeeper.api.v1 import api_v1_router
@@ -113,6 +113,16 @@ async def sitemap_xml():
     if file_path.exists():
         return Response(content=file_path.read_text(encoding="utf-8"), media_type="application/xml")
     return Response(content="<urlset xmlns='http://www.sitemaps.org/schemas/sitemap/0.9'></urlset>", media_type="application/xml")
+
+
+@app.get("/logo.png", tags=["Static"])
+@app.get("/favicon.ico", tags=["Static"])
+async def project_logo():
+    """Serves the official high-resolution 3D GateKeeper emblem."""
+    file_path = TEMPLATES_DIR / "logo.png"
+    if file_path.exists():
+        return FileResponse(file_path, media_type="image/png")
+    return Response(status_code=404)
 
 
 @app.get("/api/v1/public/metrics", tags=["Metrics"])
