@@ -8,6 +8,7 @@
 [![Tests: 50/50](https://img.shields.io/badge/tests-50%20passed-brightgreen.svg)](tests/)
 [![Security: Non-Custodial](https://img.shields.io/badge/Security-Non--Custodial-blue.svg)](https://gk.ai-futures-bot.pro)
 [![Billing: Solana Pay](https://img.shields.io/badge/Billing-Solana%20Pay%20Verified-14F195.svg)](https://gk.ai-futures-bot.pro)
+[![Agensi Skill](https://img.shields.io/badge/Agensi%20Skill-gatekeeper--solana-2563eb.svg)](https://www.agensi.io/skills/gatekeeper-solana)
 [![Gateway: Live](https://img.shields.io/badge/Gateway-gk.ai--futures--bot.pro-green.svg)](https://gk.ai-futures-bot.pro)
 
 > **Autonomous AI agents signing raw Solana transactions risk catastrophic capital loss from hallucinations, toxic slippage spikes, and DEX reverts (`0x1771`).**  
